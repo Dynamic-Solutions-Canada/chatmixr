@@ -7,14 +7,12 @@
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap desktop rescap">
 
-  <!-- No Store identity yet: the name is not reserved in Partner Center, and BRAND-6 forbids inventing
-       one. Until it is, this is the dev identity (dev_identity in windows-build.json), which the kit's
-       build-msix.ps1 stamps on signed dev builds together with the signing cert's publisher. When the
-       name is reserved, replace Name and Publisher with Partner Center's values and add store_identity
-       and store_publisher to windows-build.json in the same change. -->
+  <!-- The Store identity reserved in Partner Center (Store ID 9N3F55DFWLQP), also store_identity and
+       store_publisher in windows-build.json. Signed dev builds are stamped with dev_identity and the
+       signing certificate's publisher by the kit's build-msix.ps1; Store uploads (-NoSign) keep these values. -->
   <Identity
-    Name="TechnicallyReal.ChatMixr"
-    Publisher="CN=ChatMixr Development"
+    Name="DynamicSolutionsCA.ChatMixr"
+    Publisher="CN=B55B96A5-F10C-49D3-8D0B-7260EDBE7625"
     Version="VERSION_PLACEHOLDER"
     ProcessorArchitecture="ARCH_PLACEHOLDER" />
 

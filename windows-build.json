@@ -11,6 +11,9 @@
   "dev_identity": "TechnicallyReal.ChatMixr",
   "signing": "shared-dev",
   "trusted_certificate": true,
+  "store_identity": "DynamicSolutionsCA.ChatMixr",
+  "store_publisher": "CN=B55B96A5-F10C-49D3-8D0B-7260EDBE7625",
+  "store_identity_switch": "-StoreIdentity",
   "localization": {
     "catalog_dir": "ChatMixr/Localization/Catalogs",
     "extra_key_patterns": [
@@ -18,6 +21,9 @@
       "LabelKey\\s*=\\s*\"([^\"]+)\"",
       "HelpKey\\s*=\\s*\"([^\"]+)\""
     ]
+  },
+  "listing": {
+    "product_name": "ChatMixr"
   },
   "notices": {
     "about_source": "ChatMixr/Classes/AboutContent.cs",

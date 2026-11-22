@@ -1,0 +1,41 @@
+{
+  "microsoft": [
+    {
+      "file": "screenshots/00-popup-dark.png",
+      "source": "raw/microsoft/00-popup-dark.png",
+      "theme": "dark",
+      "crop": "tray",
+      "caption": "The tray popup: a Game to Chat slider for every device, with the headset's wheel and battery.",
+      "alt": "ChatMixr's tray popup above the notification area in the dark theme: the Arctis Nova 7X headphones, in use, at 64% battery, with a slider set by its wheel a little toward chat; Speakers (Creative Pebble V3) with its slider toward game and LG TV with its slider toward chat, each with a Switch to button; and the volume of the device in use at 100%."
+    },
+    {
+      "file": "screenshots/01-osd-dark.png",
+      "source": "raw/microsoft/01-osd-dark.png",
+      "theme": "dark",
+      "crop": "bottom",
+      "caption": "Turn the wheel or press a shortcut and a popup shows the balance.",
+      "alt": "A small dark popup at the bottom centre of the screen, just above the taskbar, with a game controller icon, a balance bar a little past the middle, and a chat icon."
+    },
+    {
+      "file": "screenshots/02-devices-dark.png",
+      "source": "raw/microsoft/02-devices-dark.png",
+      "theme": "dark",
+      "caption": "Devices: your order, Switch to, test sounds and hidden devices.",
+      "alt": "ChatMixr's Devices page in the dark theme: cards for the Arctis Nova 7X headphones with a Test button and 64% battery, Speakers and LG TV with Switch to buttons, each with a Game to Chat slider and buttons to move it up or down or hide it, above a How it works section."
+    },
+    {
+      "file": "screenshots/03-chat-apps-dark.png",
+      "source": "raw/microsoft/03-chat-apps-dark.png",
+      "theme": "dark",
+      "caption": "Chat apps: set up in-game voice chat, and search your installed apps to add a chat app.",
+      "alt": "ChatMixr's Chat apps page in the dark theme: a Game voice chat card with steps to download VB-Cable from VB-Audio and restart, a search box to add a chat app from your installed apps, and the start of the chat app list with Discord and Discord Canary."
+    },
+    {
+      "file": "screenshots/04-settings-dark.png",
+      "source": "raw/microsoft/04-settings-dark.png",
+      "theme": "dark",
+      "caption": "Settings: automatic switching, shortcuts for the mix, language and theme.",
+      "alt": "ChatMixr's Settings page in the dark theme: Start with Windows on, Switch devices when a headset turns on or off on, Keyboard shortcuts for the mix on with Ctrl+Shift+= toward chat and Ctrl+Shift+- toward game, and the language set to the system setting."
+    }
+  ]
+}
