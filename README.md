@@ -12,6 +12,14 @@
   <a href="#get-it">In development: build it yourself</a>
 </p>
 
+<p align="center">
+  <img src="store-assets/microsoft/screenshots/00-popup-dark.png" alt="ChatMixr's tray popup above the notification area in the dark theme: the Arctis Nova 7X headphones, in use, at 64% battery, with a slider set by its wheel a little toward chat; Speakers (Creative Pebble V3) with its slider toward game and LG TV with its slider toward chat, each with a Switch to button; and the volume of the device in use at 100%." width="250">
+  &nbsp;
+  <img src="store-assets/microsoft/screenshots/02-devices-dark.png" alt="ChatMixr's Devices page in the dark theme: cards for the Arctis Nova 7X headphones with a Test button and 64% battery, Speakers and LG TV with Switch to buttons, each with a Game to Chat slider and buttons to move it up or down or hide it, above a How it works section." width="250">
+  &nbsp;
+  <img src="store-assets/microsoft/screenshots/03-chat-apps-dark.png" alt="ChatMixr's Chat apps page in the dark theme: a Game voice chat card with steps to download VB-Cable from VB-Audio and restart, a search box to add a chat app from your installed apps, and the start of the chat app list with Discord and Discord Canary." width="250">
+</p>
+
 For anyone whose voice chat and game sound fight over the same headphones. Windows only offers a volume slider per app; ChatMixr gives each playback device one control that balances them. Turn toward chat and everything else gets quieter; turn toward game and your chat apps do. A SteelSeries Arctis Nova 7 headset's ChatMix wheel works too, without SteelSeries GG, on several headsets at once.
 
 ## Features
