@@ -3,6 +3,11 @@
 // losing the volume the user chose for it. Exits non-zero on the first failure.
 using ChatMixr.Models;
 
+// Ids for the switch scenarios: a headset with its own mic, speakers with none, a desk microphone.
+// Declared before the scenarios run: a top-level statement after the final return is unreachable.
+const string HeadsetA = "headset-a", HeadsetB = "headset-b", Speakers = "speakers";
+const string MicA = "mic-a", MicB = "mic-b", DeskMic = "desk-mic";
+
 var scenarios = new List<(string Name, Action Body)>
 {
     ("a ChatMix report from the Nova 7X receiver gives its game and chat levels", ParsesCapturedReports),
@@ -135,9 +140,6 @@ void SliderKeys()
     Check(SliderMix.KeyMove(90, 140) == SliderMix.Max, "out of range is clamped");
 }
 
-// Ids for the switch scenarios: a headset with its own mic, speakers with none, a desk microphone.
-const string HeadsetA = "headset-a", HeadsetB = "headset-b", Speakers = "speakers";
-const string MicA = "mic-a", MicB = "mic-b", DeskMic = "desk-mic";
 string? MicOf(string device) => device switch { HeadsetA => MicA, HeadsetB => MicB, _ => null };
 
 void SwitchFollows()
