@@ -32,6 +32,14 @@ internal static class CoreAudio
     /// <summary>The endpoint's full name, for example "Headphones (Arctis Nova 7X)".</summary>
     public static readonly PROPERTYKEY PKEY_Device_FriendlyName = new() { fmtid = new Guid("a45c254e-df1c-4efd-8020-67d146a850e0"), pid = 14 };
 
+    /// <summary>
+    /// The audio adapter an endpoint belongs to, as "{1}." and its device instance id, for example
+    /// "{1}.ROOT\MEDIA\0001" (VB-Cable) or "{1}.USB\VID_1038&amp;PID_22A5&amp;MI_00\...". Undocumented: it is the
+    /// value Windows' audio endpoint builder stores with every endpoint (seen on Windows 10 and 11), so
+    /// callers treat it as optional.
+    /// </summary>
+    public static readonly PROPERTYKEY PKEY_Endpoint_AdapterDevice = new() { fmtid = new Guid("b3f8fa53-0004-438e-9003-51a46e139bfc"), pid = 2 };
+
 
     public enum EDataFlow { Render = 0, Capture = 1, All = 2 }
 

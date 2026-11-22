@@ -12,10 +12,11 @@ namespace ChatMixr.Services;
 /// <param name="Kind">What kind of device it is.</param>
 /// <param name="EndpointName">The endpoint's own name, for example "Headphones" or "CABLE Input".</param>
 /// <param name="AdapterName">The device it belongs to, for example "Arctis Nova 7X".</param>
-public sealed record OutputInfo(string Id, string Name, Guid? ContainerId, OutputKind Kind, string EndpointName, string AdapterName)
+/// <param name="AdapterDevice">That device's Windows instance id, for example "ROOT\MEDIA\0001"; null when unknown.</param>
+public sealed record OutputInfo(string Id, string Name, Guid? ContainerId, OutputKind Kind, string EndpointName, string AdapterName, string? AdapterDevice)
 {
     /// <summary>The endpoint as the chat device pairing sees it.</summary>
-    public Models.AudioEndpoint ForPairing => new(Id, EndpointName, AdapterName, ContainerId);
+    public Models.AudioEndpoint ForPairing => new(Id, EndpointName, AdapterName, ContainerId, AdapterDevice);
 }
 
 /// <summary>One app's audio on an endpoint, valid only inside <see cref="AudioSessions.ForEachSession"/>.</summary>
@@ -113,7 +114,8 @@ internal static class AudioSessions
                             string name = ReadString(device, PKEY_Device_FriendlyName) ?? id;
                             string endpoint = ReadString(device, PKEY_Device_DeviceDesc) ?? name;
                             string adapter = ReadString(device, PKEY_DeviceInterface_FriendlyName) ?? "";
-                            outputs.Add(new OutputInfo(id, name, ReadGuid(device, PKEY_Device_ContainerId), KindOf(device), endpoint, adapter));
+                            string? adapterDevice = AdapterDeviceOf(device);
+                            outputs.Add(new OutputInfo(id, name, ReadGuid(device, PKEY_Device_ContainerId), KindOf(device), endpoint, adapter, adapterDevice));
                         }
                     }
                     finally
@@ -133,6 +135,22 @@ internal static class AudioSessions
         }
 
         return outputs;
+    }
+
+    /// <summary>
+    /// The device instance id of the endpoint's audio adapter ("ROOT\MEDIA\0001"), without the "{1}."
+    /// prefix Windows stores it with; null when the property is missing or not in that shape.
+    /// </summary>
+    private static string? AdapterDeviceOf(IMMDevice device)
+    {
+        string? stored = ReadString(device, PKEY_Endpoint_AdapterDevice);
+        if (stored == null || !stored.StartsWith('{'))
+        {
+            return null;
+        }
+
+        int prefixEnd = stored.IndexOf("}.", StringComparison.Ordinal);
+        return prefixEnd > 0 && prefixEnd + 2 < stored.Length ? stored[(prefixEnd + 2)..] : null;
     }
 
     /// <summary>The endpoint's form factor, folded into the three kinds the interface draws.</summary>

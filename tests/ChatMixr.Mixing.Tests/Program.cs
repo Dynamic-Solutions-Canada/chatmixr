@@ -43,6 +43,7 @@ var scenarios = new List<(string Name, Action Body)>
     ("the two test sounds play continuously, stay within range, and differ", TestSounds),
     ("after ChatMixr renames the cable, its two ends still pair, and it is preferred", RenamedCablePairing),
     ("the suggested microphone is the headset's own, else the first real one", MicrophoneSuggestion),
+    ("built-in speakers are real devices although they share the software devices' container", BuiltInIsNotVirtual),
     ("chat apps match by program name, with or without .exe and in any case", ChatAppMatching),
     ("an app's first volume is its baseline, and the wheel scales it", FirstSightScales),
     ("moving the wheel back to the middle restores the app's own volume", WheelBackRestores),
@@ -436,6 +437,26 @@ void MicrophoneSuggestion()
     Check(ChatDevicePairing.SuggestedMicrophone([cable, webcam, headsetMic], headset) == headsetMic, "the headset in use's own microphone");
     Check(ChatDevicePairing.SuggestedMicrophone([cable, webcam], Guid.NewGuid()) == webcam, "else the first real microphone");
     Check(ChatDevicePairing.SuggestedMicrophone([cable], null) == null, "never the cable itself");
+}
+
+void BuiltInIsNotVirtual()
+{
+    // Device ids as measured: VB-Cable on a PC, an onboard-style sound card in the test VM (2026-11-22).
+    var soft = ChatDevicePairing.SoftwareContainer;
+    var cable = new AudioEndpoint("c", "CABLE Input", "VB-Audio Virtual Cable", soft, @"ROOT\MEDIA\0001");
+    var swd = new AudioEndpoint("s", "Chat", "Some Virtual Device", soft, @"SWD\VIRTUALAUDIO\0001");
+    var onboard = new AudioEndpoint("o", "Speakers", "High Definition Audio Device", soft,
+        @"HDAUDIO\FUNC_01&VEN_1AF4&DEV_0012&SUBSYS_1AF40012&REV_1001\4&F1A043&0&0001");
+    var onboardMic = new AudioEndpoint("om", "Microphone", "Realtek(R) Audio", soft, @"HDAUDIO\FUNC_01&VEN_10EC\1");
+    var usb = new AudioEndpoint("u", "Headphones", "Arctis Nova 7X", Guid.NewGuid(), @"USB\VID_1038&PID_22A5&MI_00\8&1&0000");
+    var unknownSoft = new AudioEndpoint("x", "CABLE Input", "VB-Audio Virtual Cable", soft);
+
+    Check(ChatDevicePairing.IsVirtual(cable) && ChatDevicePairing.IsVirtual(swd), "root and software-enumerated devices are virtual");
+    Check(!ChatDevicePairing.IsVirtual(onboard), "an onboard sound card in the PC's own container is listed");
+    Check(!ChatDevicePairing.IsVirtual(usb), "a USB headset is listed");
+    Check(ChatDevicePairing.IsVirtual(unknownSoft), "without a known adapter, the software container still counts as virtual");
+    Check(ChatDevicePairing.ListenSideOf(onboard, [onboardMic]) == null, "onboard speakers never pair with the onboard microphone");
+    Check(ChatDevicePairing.SuggestedMicrophone([cable, onboardMic], soft) == onboardMic, "the onboard microphone can be suggested");
 }
 
 void ChatAppMatching()

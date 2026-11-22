@@ -5,13 +5,17 @@ namespace ChatMixr.Models;
 /// <param name="EndpointName">The endpoint's own name, for example "CABLE Input".</param>
 /// <param name="AdapterName">The device it belongs to, for example "VB-Audio Virtual Cable".</param>
 /// <param name="ContainerId">Its physical device, or null.</param>
-public sealed record AudioEndpoint(string Id, string EndpointName, string AdapterName, Guid? ContainerId);
+/// <param name="AdapterDevice">
+/// The Windows device instance id of the audio adapter it belongs to, for example
+/// "ROOT\MEDIA\0001" (VB-Cable) or "USB\VID_1038&amp;PID_22A5&amp;MI_00\..." (a headset); null when unknown.
+/// </param>
+public sealed record AudioEndpoint(string Id, string EndpointName, string AdapterName, Guid? ContainerId, string? AdapterDevice = null);
 
 /// <summary>
 /// Finds the recording side of a virtual cable, so the chat relay can listen to what a game sends
 /// to its playback side. Only virtual devices qualify: a real headset's playback side would pair
-/// with its own microphone. Windows gives every software device the same "no physical device"
-/// container, so the container alone can't pair them; the names do.
+/// with its own microphone. Software devices share one container with the PC's built-in hardware,
+/// so the container alone can't pair them; the names do.
 /// </summary>
 public static class ChatDevicePairing
 {
@@ -27,11 +31,50 @@ public static class ChatDevicePairing
     /// <summary>VB-Cable's own names, put back by "Restore VB-Cable's names" when nothing better is remembered.</summary>
     public const string StockPlaybackName = "CABLE Input", StockRecordingName = "CABLE Output";
 
-    /// <summary>The container Windows gives devices with no physical part (VB-Cable, Voicemeeter, Sonar).</summary>
+    /// <summary>
+    /// The container Windows gives the PC itself: software devices (VB-Cable, Voicemeeter, Sonar), but
+    /// also hardware built into the PC, such as onboard or laptop speakers. Only a fallback for telling
+    /// them apart, when the adapter is unknown.
+    /// </summary>
     public static readonly Guid SoftwareContainer = new("00000000-0000-0000-ffff-ffffffffffff");
 
-    /// <summary>True when a playback endpoint is a software device, so it can be offered as the chat device.</summary>
-    public static bool IsVirtual(AudioEndpoint playback) => playback.ContainerId == SoftwareContainer;
+    /// <summary>
+    /// Device enumerators that create software devices: "ROOT" (drivers installed without hardware, as
+    /// VB-Cable's and Sonar's are) and "SWD" (Windows' software device enumerator). Real audio hardware
+    /// comes from a bus: USB, HDAUDIO, BTHENUM and so on.
+    /// </summary>
+    private static readonly string[] SoftwareEnumerators = ["ROOT", "SWD"];
+
+    /// <summary>
+    /// True when an endpoint (playback or recording) belongs to a software device: never listed or
+    /// mixed as a device, and the only kind offered as the chat device. Decided by the enumerator of the
+    /// endpoint's audio adapter, because the PC's own speakers share the software devices' container.
+    /// Without a known adapter, falls back to that container, so a cable is never taken for a device.
+    /// </summary>
+    public static bool IsVirtual(AudioEndpoint endpoint)
+    {
+        if (EnumeratorOf(endpoint.AdapterDevice) is { } enumerator)
+        {
+            return SoftwareEnumerators.Contains(enumerator, StringComparer.OrdinalIgnoreCase);
+        }
+
+        return endpoint.ContainerId == SoftwareContainer;
+    }
+
+    /// <summary>
+    /// The enumerator part of a device instance id: "ROOT" from "ROOT\MEDIA\0001", "USB" from
+    /// "USB\VID_...". Null when there is no id or it has no enumerator.
+    /// </summary>
+    private static string? EnumeratorOf(string? deviceInstanceId)
+    {
+        if (string.IsNullOrWhiteSpace(deviceInstanceId))
+        {
+            return null;
+        }
+
+        int separator = deviceInstanceId.IndexOf('\\');
+        return separator > 0 ? deviceInstanceId[..separator] : null;
+    }
 
     /// <summary>
     /// The recording endpoint to listen to for a virtual playback endpoint: the one in the same device
@@ -88,7 +131,7 @@ public static class ChatDevicePairing
     /// </summary>
     public static AudioEndpoint? SuggestedMicrophone(IEnumerable<AudioEndpoint> recording, Guid? outputContainer)
     {
-        var real = recording.Where(r => r.ContainerId != SoftwareContainer).ToList();
+        var real = recording.Where(r => !IsVirtual(r)).ToList();
         return real.FirstOrDefault(r => outputContainer != null && r.ContainerId == outputContainer) ?? real.FirstOrDefault();
     }
 }
