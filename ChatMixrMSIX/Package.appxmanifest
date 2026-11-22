@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap desktop rescap">
+
+  <!-- No Store identity yet: the name is not reserved in Partner Center, and BRAND-6 forbids inventing
+       one. Until it is, this is the dev identity (dev_identity in windows-build.json), which the kit's
+       build-msix.ps1 stamps on signed dev builds together with the signing cert's publisher. When the
+       name is reserved, replace Name and Publisher with Partner Center's values and add store_identity
+       and store_publisher to windows-build.json in the same change. -->
+  <Identity
+    Name="TechnicallyReal.ChatMixr"
+    Publisher="CN=ChatMixr Development"
+    Version="VERSION_PLACEHOLDER"
+    ProcessorArchitecture="ARCH_PLACEHOLDER" />
+
+  <Properties>
+    <DisplayName>ChatMixr</DisplayName>
+    <PublisherDisplayName>Dynamic Solutions (CA)</PublisherDisplayName>
+    <Logo>Images\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.26100.0" />
+    <!-- Keep in step with Microsoft.WindowsAppSDK in ChatMixr.csproj (1.8 line). -->
+    <PackageDependency Name="Microsoft.WindowsAppRuntime.2" MinVersion="2.6.5.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
+  </Dependencies>
+
+  <!-- Interface languages: keep in step with ChatMixr/Classes/AppLanguages.cs and Localization/Catalogs/*.json
+       (npm run check:l10n). ms-resource:Resources/<Key> strings come from those catalogs; the
+       MSIX script indexes them into resources.pri. -->
+  <Resources>
+    <Resource Language="en-US" />
+    <Resource Language="en-CA" />
+    <Resource Language="es-ES" />
+    <Resource Language="fr-FR" />
+    <Resource Language="fr-CA" />
+    <Resource Language="de-DE" />
+    <Resource Language="zh-CN" />
+    <Resource Language="pt-BR" />
+    <Resource Language="ja-JP" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+      Executable="ChatMixr.exe"
+      EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="ChatMixr"
+        BackgroundColor="transparent"
+        Square150x150Logo="Images\Square150x150Logo.png"
+        Square44x44Logo="Images\Square44x44Logo.png"
+        Description="ms-resource:Resources/AppDescription">
+        <uap:SplashScreen Image="Images\SplashScreen.png" />
+      </uap:VisualElements>
+      <Extensions>
+        <!-- desktop: (not uap:) namespace - makeappx rejects uap: startup tasks for full-trust apps. -->
+        <desktop:Extension Category="windows.startupTask">
+          <desktop:StartupTask TaskId="ChatMixrStartup" Enabled="true" DisplayName="ChatMixr" />
+        </desktop:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>

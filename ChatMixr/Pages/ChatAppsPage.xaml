@@ -1,0 +1,85 @@
+<local:LivePage
+    x:Class="ChatMixr.Pages.ChatAppsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ChatMixr.Pages"
+    xmlns:l10n="using:WinUIAppKit.Localization"
+    xmlns:cls="using:ChatMixr.Classes">
+    <ScrollViewer>
+        <StackPanel Style="{StaticResource PageContentStyle}">
+            <TextBlock l10n:Localize.Text="nav.chat-apps" Style="{StaticResource PageTitleStyle}" />
+
+            <!-- Game voice chat through a virtual cable: pick the cable, see where it plays -->
+            <TextBlock l10n:Localize.Text="chat-device.header" Style="{StaticResource FirstSectionHeaderStyle}" />
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Spacing="10">
+                    <TextBlock l10n:Localize.Text="chat-device.intro" TextWrapping="Wrap" />
+                    <!-- No cable yet: the guided VB-Cable steps (ChatDeviceSetup); ChatMixr never runs the installer itself -->
+                    <StackPanel x:Name="CableSteps" Spacing="10">
+                        <TextBlock l10n:Localize.Text="cable-setup.step-download" TextWrapping="Wrap" />
+                        <Button Click="OpenCablePage_Click" l10n:Localize.Name="cable-setup.open-page">
+                            <StackPanel Style="{StaticResource IconLabelStyle}">
+                                <FontIcon Glyph="&#xE8A7;" Style="{StaticResource ButtonGlyphStyle}" />
+                                <TextBlock l10n:Localize.Text="cable-setup.open-page" />
+                            </StackPanel>
+                        </Button>
+                        <TextBlock l10n:Localize.Text="cable-setup.step-install" TextWrapping="Wrap" />
+                        <TextBlock l10n:Localize.Text="cable-setup.step-restart" TextWrapping="Wrap" />
+                        <Button Click="Restart_Click" l10n:Localize.Name="cable-setup.restart">
+                            <StackPanel Style="{StaticResource IconLabelStyle}">
+                                <FontIcon Glyph="&#xE777;" Style="{StaticResource ButtonGlyphStyle}" />
+                                <TextBlock l10n:Localize.Text="cable-setup.restart" />
+                            </StackPanel>
+                        </Button>
+                        <TextBlock l10n:Localize.Text="cable-setup.step-done" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+
+                    <!-- A cable is installed: the switch, and while it is on, the device to pick in games and chat apps -->
+                    <StackPanel x:Name="CableReady" Spacing="6">
+                        <cls:LabeledSwitch x:Name="InGameChatSwitch" Toggled="InGameChatSwitch_Toggled" />
+                        <TextBlock x:Name="CableExplicitText" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                        <ContentPresenter x:Name="MicrophoneHost" />
+                        <cls:LabeledSwitch x:Name="RenameCableSwitch" Toggled="RenameCableSwitch_Toggled" />
+                        <TextBlock l10n:Localize.Text="cable-ready.rename-note" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- While the virtual chat device is on, voice chat is told apart by device, so the list is hidden (and not applied) -->
+            <TextBlock x:Name="ChatListOffNote" l10n:Localize.Text="chat-apps.list-off" Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Margin="0,12,0,0" />
+            <StackPanel x:Name="ChatListSection">
+                <TextBlock l10n:Localize.Text="chat-apps.intro" TextWrapping="Wrap" Margin="0,24,0,0" />
+                <!-- Search: installed apps by name, best match first; Enter adds the top match or the typed program name -->
+                <TextBlock l10n:Localize.Text="chat-apps.add-label" Style="{StaticResource SectionHeaderStyle}" />
+                <AutoSuggestBox x:Name="SearchBox" l10n:Localize.Placeholder="chat-apps.search-placeholder"
+                                QueryIcon="Find" UpdateTextOnSelect="False"
+                                TextChanged="SearchBox_TextChanged" QuerySubmitted="SearchBox_QuerySubmitted" />
+                <TextBlock x:Name="SearchNote" Style="{StaticResource CaptionTextBlockStyle}" Margin="0,6,0,0"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+
+                <!-- The chat list: one card per app with Remove, or an empty message (built in code) -->
+                <TextBlock l10n:Localize.Text="chat-apps.list" Style="{StaticResource SectionHeaderStyle}" />
+                <StackPanel x:Name="AppsPanel" />
+
+                <!-- Presets that were removed and apps playing now that aren't chat apps, each with Add -->
+                <StackPanel x:Name="SuggestedSection">
+                    <Grid Margin="0,0,0,0">
+                        <TextBlock l10n:Localize.Text="chat-apps.suggested" Style="{StaticResource SectionHeaderStyle}" />
+                        <Button x:Name="AddAllButton" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,8"
+                                Click="AddAll_Click" l10n:Localize.Content="chat-apps.add-all" l10n:Localize.ToolTip="chat-apps.add-all-tip" />
+                    </Grid>
+                    <StackPanel x:Name="SuggestedPanel" />
+                </StackPanel>
+
+                <TextBlock l10n:Localize.Text="chat-apps.limits" Style="{StaticResource SectionHeaderStyle}" />
+                <Border Style="{StaticResource CardBorderStyle}">
+                    <TextBlock l10n:Localize.Text="chat-apps.browser-note" TextWrapping="Wrap" />
+                </Border>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</local:LivePage>

@@ -1,0 +1,26 @@
+{
+  "project": "ChatMixr/ChatMixr.csproj",
+  "package_script": "external/winui-app-kit/build/build-msix.ps1",
+  "msix_dir": "ChatMixrMSIX",
+  "manifest_strings": {
+    "catalog_dir": "ChatMixr/Localization/Catalogs"
+  },
+  "package_output": "ChatMixrMSIX/bin/msix-output",
+  "certificate": ".windows-build/signing.pfx",
+  "version_file": "Directory.Build.props",
+  "dev_identity": "TechnicallyReal.ChatMixr",
+  "signing": "shared-dev",
+  "trusted_certificate": true,
+  "localization": {
+    "catalog_dir": "ChatMixr/Localization/Catalogs",
+    "extra_key_patterns": [
+      "DescriptionKey\\s*=\\s*\"([^\"]+)\"",
+      "LabelKey\\s*=\\s*\"([^\"]+)\"",
+      "HelpKey\\s*=\\s*\"([^\"]+)\""
+    ]
+  },
+  "notices": {
+    "about_source": "ChatMixr/Classes/AboutContent.cs",
+    "product_name": "ChatMixr"
+  }
+}

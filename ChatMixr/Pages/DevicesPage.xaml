@@ -1,0 +1,49 @@
+<local:LivePage
+    x:Class="ChatMixr.Pages.DevicesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ChatMixr.Pages"
+    xmlns:l10n="using:WinUIAppKit.Localization">
+    <ScrollViewer>
+        <StackPanel Style="{StaticResource PageContentStyle}">
+            <TextBlock l10n:Localize.Text="nav.devices" Style="{StaticResource PageTitleStyle}" />
+
+            <TextBlock l10n:Localize.Text="devices.list" Style="{StaticResource FirstSectionHeaderStyle}" />
+            <!-- One card per device (DeviceList); the cards are the surface, so no card around them -->
+            <ContentPresenter x:Name="EmptyHost" />
+            <ListView x:Name="Devices">
+                <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Margin" Value="0" />
+                            <Setter Property="MinHeight" Value="0" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+            </ListView>
+            <!-- What the list's controls do: one idea per line -->
+            <StackPanel Spacing="2">
+                <TextBlock l10n:Localize.Text="devices.order-note" Style="{StaticResource SecondaryCaptionStyle}" TextWrapping="Wrap" />
+                <TextBlock l10n:Localize.Text="devices.switch-note" Style="{StaticResource SecondaryCaptionStyle}" TextWrapping="Wrap" />
+                <TextBlock l10n:Localize.Text="devices.hide-note" Style="{StaticResource SecondaryCaptionStyle}" TextWrapping="Wrap" />
+            </StackPanel>
+            <!-- Sonar takes the apps' audio away from the headset; shown only while it runs -->
+            <ContentPresenter x:Name="SonarHost" Margin="0,8,0,0" />
+
+            <!-- Hidden devices, each with Show; the section is collapsed while nothing is hidden -->
+            <StackPanel x:Name="HiddenSection" Visibility="Collapsed">
+                <TextBlock l10n:Localize.Text="devices.hidden" Style="{StaticResource SectionHeaderStyle}" />
+                <StackPanel x:Name="HiddenPanel" />
+            </StackPanel>
+
+            <TextBlock l10n:Localize.Text="devices.how" Style="{StaticResource SectionHeaderStyle}" />
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Spacing="8">
+                    <TextBlock l10n:Localize.Text="devices.how-slider" TextWrapping="Wrap" />
+                    <TextBlock l10n:Localize.Text="devices.how-volumes" TextWrapping="Wrap" />
+                    <TextBlock l10n:Localize.Text="devices.how-wheel" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</local:LivePage>

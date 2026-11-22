@@ -1,0 +1,30 @@
+version: 2
+
+# Weekly, grouped updates (HYG-8). Versions live in the root Directory.Packages.props (central package
+# management); the harness under tests/ has no package references. The shared versions it imports from
+# winui-app-kit (Windows App SDK, NLog, CommunityToolkit.Mvvm) move with a kit tag, not here, so they
+# are ignored below.
+
+updates:
+  - package-ecosystem: nuget
+    directories:
+      - "/"
+      - "/ChatMixr"
+    schedule:
+      interval: weekly
+    groups:
+      nuget:
+        patterns: ["*"]
+    ignore:
+      # Owned by winui-app-kit's WinUIAppKit.Packages.props (PLAT-5); an app never moves ahead of the kit.
+      - dependency-name: Microsoft.WindowsAppSDK
+      - dependency-name: NLog
+      - dependency-name: CommunityToolkit.Mvvm
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]

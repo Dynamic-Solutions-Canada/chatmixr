@@ -1,0 +1,120 @@
+# ChatMixr: Agent Instructions
+
+ChatMixr is a resident WinUI 3 tray app that balances chat apps against everything else on each playback device by adjusting each app's own volume. Its tray popup lists every device with its own Game-to-Chat slider and a Switch to button that moves Windows' defaults to it. For SteelSeries Arctis Nova 7 family headsets it also reads each receiver's ChatMix wheel itself, without SteelSeries GG, on several headsets at once; with two Nova 7 receivers plugged in, GG was seen to follow only one wheel. It ships as an MSIX (`ChatMixrMSIX/`) built from WSL through the shared Windows build bridge. The tray, flyout, settings-file, startup, theme and localization plumbing come from the shared WinUI App Kit submodule at `external/winui-app-kit`, and the "Our other apps" page from the apps-promo submodule at `external/promo`.
+
+## Standards
+
+This repo follows the shared standards at https://github.com/Dynamic-Solutions-Canada/app-standards. Read the index for this stack, https://github.com/Dynamic-Solutions-Canada/app-standards/blob/main/stacks/windows.md, then the topic file for the area you are changing. If `external/standards/` exists, it is the same content pinned for offline use. Where this file differs from the standards, this file wins and says why.
+
+**Not yet set up, on purpose:** the app has no Partner Center reservation, so it has no Store identity (BRAND-6), no Store listing, screenshots or release notes, no release or Store workflows (`build-msix.yml`, `store-publish.yml`, `credential-expiry.yml`), no `release` skill, no privacy policy page and no registry entry (BRAND-10). `validate` therefore leaves out `check:listing` and `check:screenshots`. Add them, following the standards' distribution and release rules (DIST-4, REL-6, LIST-5), in the change that reserves the name. The GitHub repository does not exist yet either.
+
+## Architecture
+
+| Area | Files |
+|---|---|
+| Startup order (crash logging, single instance, settings, host) | `App.xaml.cs` (kit `AppBootstrap`) |
+| Host (hidden, resident, owns tray + engine, exit steps); identity values | `MainWindow.xaml(.cs)` (kit `HostWindow`) |
+| Tray flyout (the device list) | `Windows/MixFlyout.xaml(.cs)` |
+| Main window (Devices, Chat apps, Settings, Our other apps, About) | `MixerWindow.xaml(.cs)` (kit `SettingsShell`), `Pages/*`; live pages derive from `Pages/LivePage.cs` |
+| The one list row (a card: icon, title, caption, actions) | `Classes/CardRow.cs` |
+| The device list (popup and Devices page) and what its controls do (use, slider, order, hide); wording and icons; secondary-text message | `Classes/DeviceList.cs`, `Classes/DeviceActions.cs`, `Classes/MixVisuals.cs`, `Classes/EmptyState.cs` |
+| Installed apps for the chat app search (Start menu, uninstall entries, packages) | `Services/InstalledApps.cs` |
+| Tray icon artwork (no headset / waiting / mixing / Sonar conflict) | `Classes/TrayIconRenderer.cs` |
+| Mixing: audio thread, passes, devices, receivers, restore on exit | `Services/MixEngine.cs` |
+| Windows' defaults: games and media, calls, microphone (undocumented `IPolicyConfig`) | `Services/DefaultDevices.cs` (reads and switches), `Services/AudioPolicy.cs` (the calls); what a switch moves in `Models/DefaultRoles.cs` |
+| Shut down, restart and sign-out run the exit steps | `Classes/SessionEnd.cs` |
+| The guided VB-Cable setup | `Classes/ChatDeviceSetup.cs` |
+| The on-screen popup: the mix (wheel turns, shortcut presses) and the device auto-switching picked; modelled on Hub Display Switch's | `Windows/OsdWindow.xaml(.cs)` |
+| Styles for rows, badges and notes built in code (theme-aware) | `Styles/RowStyles.xaml`, `Classes/CardRow.cs`, `Classes/Pill.cs` |
+| The device test sounds | `Services/TestPlayer.cs`, `Models/TestSignal.cs` |
+| Separate chat's relay (records the virtual cable, plays it on the calls device, else the device in use, at its chat level) | `Services/ChatRelay.cs`; buffer, drift and cable pairing in `Models/RelayBuffer.cs`, `Models/RelaySilence.cs`, `Models/ChatDevicePairing.cs` |
+| Receivers: supported product ids, opening and reading the ChatMix interface | `Services/Receivers.cs`, `Services/HidInterop.cs` |
+| Playback devices and app volumes on them | `Services/AudioSessions.cs`, `Services/CoreAudio.cs` |
+| Apps' own volumes kept across a crash (`volume-baselines.json`) | `Services/BaselineFile.cs` |
+| Portable rules: wheel report, slider levels, volume curve, chat apps and presets, the app search, device order, volume bookkeeping, snapshot | `Models/*.cs` |
+| Settings (the kit's versioned store, with Reset) | `ViewModels/UserSettings.cs`, `Classes/SettingsManager.cs`, `Classes/SettingsMigrations.cs` |
+| Interface text (9 languages) | `Localization/Catalogs/*.json`, `Classes/AppLanguages.cs` |
+| About (the kit's page); the repo and privacy URL, named once | `Classes/AboutContent.cs` |
+| Third-party notices | `ChatMixr/THIRD-PARTY-NOTICES.txt`, generated by the kit's `generate-notices.py` (`npm run generate:notices`) |
+| App icon and MSIX images | `ChatMixrMSIX/generate-msix-images.ps1` (committed output, ASCII only), `ChatMixrMSIX/Package.appxmanifest` |
+| "Our other apps" page | `external/promo` submodule, imported in the csproj |
+
+## Behaviour
+
+- **The wheel:** each supported receiver sends a report on its vendor-defined HID interface (usage page 0xFF00) whenever its wheel moves: report ID 0, opcode 0x45, game level, chat level, each 0 to 100. Both are 100 in the middle. ChatMixr opens the interface shared, so SteelSeries GG can read it too. Measured on the Nova 7X (PID 22A5) and Nova 7X Gen 2 (229E); the other Nova 7 family ids come from the Linux kernel's driver and are untested.
+- **Which headset:** a receiver's HID interface and its playback endpoints share a Windows container id; that is the only link, since the receivers have no serial number.
+- **Devices:** every active playback device is listed and mixed. A device whose container id matches a connected receiver takes its levels from that wheel (its slider shows the wheel and can't be dragged); every other device has its own slider, -100 (toward game) to 100 (toward chat), 0 leaving both at 100, saved per endpoint id in settings (shortly after a drag, and at exit).
+- **Switch to:** Windows keeps three defaults: games and media (console and multimedia roles), calls (communications) and the microphone. A plain Switch to (and auto-switching) moves games and media, and brings calls and the microphone along only when they were with the device being replaced (a headset's own mic, found by container id), so "speakers for games, headset for calls" stays split and a desk microphone stays put (`Models/DefaultRoles.cs`). The button's menu moves one of them alone, or everything; the device in use has the menu alone when calls or its mic are elsewhere. Devices holding calls or the mic apart from the device in use show a Calls or Mic badge. All through the undocumented `IPolicyConfig` that Windows' own Sound settings use. The calls device the user chose is kept in settings (`CallsDevice`), because in-game voice chat lends Windows' communications default to the cable.
+- **Hidden devices:** taken out of both lists (Hide on the page's cards and in every card's right-click menu) and listed on the Devices page with Show. They are still mixed at their slider's position.
+- **Chat apps page:** a search of installed apps (Start menu shortcuts, uninstall entries and packages, the way Little Launcher finds apps; a Squirrel shortcut's program is the one after `--processStart`), the chat list as cards with Remove, and Suggested: removed presets (with Add all) and programs heard on any device, remembered across restarts (the 30 most recent), each with Add.
+- **New apps:** an app that starts playing is picked up by the next pass (within a second): its current volume becomes its baseline and it is scaled.
+- **Mix shortcuts (off by default, Settings):** two global shortcuts (Ctrl+Shift+Plus / Minus by default, recorded by the user on the Settings page; `Models/Shortcut.cs` has the rules: a modifier and a real key, and the two must differ) move the device in use 10 steps toward chat / game, stopping at the middle; nothing on a wheel device. Global hotkeys registered on the host window (`Classes/MixShortcuts.cs`); while on, other apps don't receive those keys, and the Settings page says when another app already holds one.
+- **Headset state and auto-switch:** each receiver is asked for its status when it connects (power, battery, wheel position: no "move the wheel" wait), and announces power and battery changes itself (`Models/ReceiverReport.cs`). Cards show "On · 79%" or "Off" (dimmed). With "Switch devices when a headset turns on or off" (Settings, on by default), a headset turning on or off makes ChatMixr switch (follow-along) to the first ready device in the user's device order (a headset while on, any other device always, hidden ones never) and show the device in the on-screen popup; between changes, a manual switch sticks. A headset that comes on is asked for its status again; a status's wheel levels count only while the headset is on. Overlaps with Hub Display Switch's audio switching; turn one off if they disagree.
+- **Volume row:** the tray popup shows the in-use device's own volume and mute (Windows' endpoint volume), read fresh with each snapshot so keyboard volume keys and Windows' own slider show within a second.
+- **Mix popup:** a ChatMix wheel turn or a mix shortcut press shows the device and its Game-to-Chat position bottom-centre on the main display, like Windows' volume popup: never activates, click-through, holds 1.5 s after the last change, then fades. Not for the start-up status reading, and not while the tray popup is open.
+- **Centre detent:** a dragged slider within 5 of the middle snaps to it.
+- **Order:** the user's order, by endpoint id, from dragging in the popup or the Devices page, or Move up and Move down on the page. Devices not connected keep their place; new ones go last, in Windows' order.
+- **Mixing:** on each device, chat apps (the editable list, matched by program name without `.exe`) get the chat factor and every other app the game factor. Factor = (level / 100)², a starting point to tune by ear. Windows' system sounds and ChatMixr itself are left alone.
+- **Apps' own volumes are kept:** ChatMixr sets baseline × factor, never an absolute level. The baseline is an app's level before ChatMixr touched it; a level ChatMixr did not set is the user's change in Windows' mixer and becomes the new baseline. Baselines are saved in `volume-baselines.json` so a crash doesn't turn a scaled level into a baseline, and a clean exit puts every reachable app back and forgets those baselines.
+- **A wheel device isn't scaled until its receiver says where the wheel is:** asked when the receiver connects and when its headset comes on. At start, apps a previous run left turned down (a crash, or an update that ended it) are put back first. Shut down, restart and sign-out run the exit steps like Exit (`Classes/SessionEnd.cs`).
+- **Passes:** every second the engine re-applies (new apps, user changes); every third pass it also looks for receivers and devices and checks whether SteelSeries Sonar runs. The default device is read every pass.
+- **Sonar:** while `SteelSeriesSonar` runs, apps play to Sonar's virtual devices, not the headset, so ChatMixr can't mix the headset. With a wheel headset connected, the popup, Devices page, tooltip and an amber tray dot say so.
+- **Virtual devices are never shown:** any software device (Windows' "no physical device" container: VB-Cable, Sonar's) is left out of the lists and mixing; ChatMixr manages the cable itself.
+- **Separate chat (game voice chat):** games play their own voice chat from the game's program, so per-app mixing can't separate it. With a virtual cable installed (VB-Cable, through the guided steps on the Chat apps page; `Classes/ChatDeviceSetup.cs`), one "Mix in-game voice chat separately" switch (in the popup and on the Chat apps page; Separate chat in code) applies everywhere. While it is on, ChatMixr makes the cable Windows' default *communications* device (voice chat set to "Default" follows; apps that pick a device are pointed at "CABLE Input" by hand) and plays the cable's recording side on the calls device the user chose (else the device in use) at its chat level (`Services/ChatRelay.cs`). When it is off, or at exit, shutdown or sign-out, the communications default goes back to that calls device so voice chat is never left on a cable nobody plays. A crash can leave it on the cable until ChatMixr next starts. The cable is the first virtual device whose recording side pairs by name (VB-Cable's plain "CABLE Input" preferred over its 16-channel twin). Delay: 20 ms recording buffer, the output kept about 30 ms ahead (a 60 ms buffer never filled), and clock drift trimmed back to 10 ms held, during quiet moments or regardless past 60 ms (`RelayBuffer.Trim`, `Models/RelaySilence.cs`); silence is added when the output would run dry. The relay thread runs at MMCSS "Pro Audio" priority. It records the cable only while something plays into it (checked every 250 ms) and 8 s after, so Windows' microphone indicator isn't always on. While it is on, the chat app list is hidden and not applied: every app playing straight on a device is game sound, and voice chat is whatever arrives through the cable. The switch's caption names the device to pick in games and chat apps. The game side stays on per-app volumes until ChatMixr's own driver.
+- **VB-Cable is never downloaded or run by ChatMixr:** its licence forbids integrating its package into another software's installation procedure without the author's agreement. The guided steps open VB-Audio's page, say what to run, offer a restart (after asking), and turn on in-game voice chat when the cable appears.
+- **Test:** a Test button on the device in use plays a game sound (a low pulsing hum) and a chat sound (a two-note chime every 1.5 s) continuously, together, until stopped, so the slider or wheel can be heard moving the balance (`Services/TestPlayer.cs`, `Models/TestSignal.cs`). The game sound plays on the device at its game level; the chat sound goes through the cable when that device is separating chat (so hearing it proves the route), otherwise on the device at its chat level. One device tests at a time; exit stops it.
+- **Limits:** a chat in a browser tab is mixed with the rest of that browser (apps are told apart by program), unless the chat service can send its output to the chat device.
+- **Planned, not built: ChatMixr's own virtual devices.** A separate signed audio driver project (C, from Microsoft's ACX or SysVAD samples; Rust has no audio driver support) creating two devices named exactly "ChatMixr (game)" and "ChatMixr (chat)". It needs an EV code-signing certificate, a Partner Center hardware account and its own installer (an MSIX can't install drivers), and is developed on the build VM, never a gaming PC (test-signing mode breaks anti-cheat). Separate chat would then route games to ChatMixr (game) and voice chat to ChatMixr (chat), and the game side moves off per-app volumes.
+
+## Conventions and gotchas
+
+- The kit's [Gotchas](external/winui-app-kit/README.md#gotchas) apply here and are not repeated (identity values, single instance before settings, the `ChatMixr.Windows` namespace shadowing `Windows.*`, flyouts, physical paths, interface text). This app's identity values are the constants at the top of `MainWindow.xaml.cs` and never change.
+- **Threads:** all Core Audio calls and the volume bookkeeping run on the engine's one audio thread. Receivers' reader threads, the timer and the interface only post work to it. The interface reads `MixEngine.Snapshot` on the UI thread and redraws on `Changed`.
+- **Portable rules stay portable:** anything in `Models/` must not touch Windows, so the Linux harness can link it unchanged.
+- **Every user-visible string goes through the catalogs.** Add the key to all seven `Localization/Catalogs/*.json` (en-CA and fr-CA reuse en-US and fr-FR); never define a `kit.` key. Program names, device names and logs are never translated. Translations are unreviewed machine translations.
+- **Package identity:** the manifest carries the dev identity `TechnicallyReal.ChatMixr` until Partner Center assigns the Store one; the kit's packaging script stamps signed dev builds with it and the dev certificate's publisher. Never invent a Store identity.
+- **Product name:** "ChatMix" is SteelSeries' feature name. The maintainer chose "ChatMixr" knowing the trademark risk; listing text names SteelSeries and Arctis only to say what the app works with.
+
+## Commands
+
+Source is authoritative in WSL, with submodules initialised (`git submodule update --init`); setup is in `docs/development.md`.
+
+| Command | Proves | Does not prove |
+| --- | --- | --- |
+| `npm run verify:desktop` | The app compiles on Windows (Debug), XAML included | That it packages or runs |
+| `npm run package:desktop:dev` | A signed dev package builds | That it installs or runs |
+| `npm run install:desktop` | The dev package updates in place and launches | Behaviour; check it with the headsets |
+| `npm run package:desktop` | An unsigned package builds, manifest strings resolved for every language | Signing; that it runs; it carries the dev identity until the name is reserved |
+| `npm run check:l10n` | The kit's catalog check: keys, placeholders, no em dashes, manifest languages, no app `kit.` keys | That the text is translated well |
+| `npm test` | Every harness under `tests/` passes on Linux: the mixing rules and the settings file | Anything needing Windows or the headsets (see each README) |
+| `npm run check:notices` | The notices file matches the restored packages, and About links to its real path | That licences were read right |
+| `npm run validate` | The Linux gate: format, gitignore, l10n and notices checks, then `npm test` | A Windows compile; also run `verify:desktop` |
+| `npm run format` | Rewrites C# outside `external/` to the kit's style | Behaviour |
+
+Before finishing a change, run `npm run validate` and `npm run verify:desktop`; use the `desktop` skill for builds and installs.
+
+## Guidance map
+
+| Guide, doc, or skill | Read or use when | Governs |
+| --- | --- | --- |
+| [docs/development.md](docs/development.md) | Building, checking, or changing where the app writes data | Build setup, data locations, manual checks |
+| [.agents/guides/ui-conventions.md](.agents/guides/ui-conventions.md) | Any window, page, flyout, row or card | `ChatMixr/**/*.xaml(.cs)`, `ChatMixr/Windows/**`, `ChatMixr/Pages/**` |
+| [WinUI App Kit README](external/winui-app-kit/README.md) | Using any kit API or shared XAML | `external/winui-app-kit/**` (read only) |
+| [Windows build tools README](https://github.com/Dynamic-Solutions-Canada/windows-build-tools) | A Windows build, install or packaging problem | `windows-build.json`, the kit's `scripts/windows-build` |
+| `desktop` skill | Building, verifying or installing locally | Local Windows builds |
+
+## Keeping docs current
+
+| What changed | Update |
+| --- | --- |
+| A file, service or window added, moved or removed | The Architecture table above |
+| A UI pattern, shared style or control | `.agents/guides/ui-conventions.md` |
+| An npm command | The Commands table above, `docs/development.md`, the `desktop` skill, `paseo.json`, and `.github/workflows/ci.yml` if `validate` or the Windows compile changes |
+| A mixing rule, the wheel report or a supported receiver | Behaviour above, `README.md`, the manual checks in `docs/development.md`, `tests/ChatMixr.Mixing.Tests/` |
+| Where the app writes data, or a new kind of data | The data table in `docs/development.md` |
+| A setting's shape | A step in `Classes/SettingsMigrations.cs` and a scenario in `tests/ChatMixr.Settings.Tests/` |
+| winui-app-kit pin bumped | The kit's `.editorconfig` and `build/shared.gitignore` (the last part of `.gitignore`) at that tag, then `npm run format` |
+| A language or catalog rule | Conventions above, the `localization` block in `windows-build.json` |
+| A NuGet package added, removed or updated | `npm run generate:notices`, and commit the notices file |
+| The name is reserved in Partner Center | The manifest identity, `store_identity` and `store_publisher` in `windows-build.json`, the Store listing and its checks in `validate`, the release and Store workflows, the `release` skill, and the "Not yet set up" note above |
+| A guide or skill moved or removed | The guidance map above and every skill that names it |

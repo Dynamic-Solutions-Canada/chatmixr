@@ -1,0 +1,19 @@
+{
+  "name": "chatmixr",
+  "private": true,
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "scripts": {
+    "package:desktop:dev": "external/winui-app-kit/scripts/windows-build --dev",
+    "verify:desktop": "external/winui-app-kit/scripts/windows-build --build-only --configuration Debug",
+    "install:desktop": "external/winui-app-kit/scripts/windows-build --install",
+    "package:desktop": "external/winui-app-kit/scripts/windows-build --no-sign",
+    "test": "external/winui-app-kit/scripts/run-tests",
+    "validate": "npm run format:check && npm run check:gitignore && npm run check:l10n && npm run check:notices && npm test",
+    "format": "external/winui-app-kit/scripts/format",
+    "format:check": "external/winui-app-kit/scripts/format --check",
+    "check:l10n": "python3 external/winui-app-kit/scripts/check-localization.py",
+    "check:gitignore": "external/winui-app-kit/scripts/check-gitignore .",
+    "check:notices": "python3 external/winui-app-kit/scripts/generate-notices.py --check",
+    "generate:notices": "python3 external/winui-app-kit/scripts/generate-notices.py"
+  }
+}

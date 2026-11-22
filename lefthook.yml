@@ -1,0 +1,31 @@
+# Git hooks (HYG-10): block what must never be committed. Hooks check staged files only and stay
+# fast; tests belong to CI. Install lefthook, then run `lefthook install` once per clone.
+min_version: 2.2.2
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: devkit precommit
+      # The kit's shared check: signing material and keys (.pfx, .p12, .cer, .der, .jks, .keystore),
+      # env files other than examples, anything under .secrets/, staged private keys, and files over
+      # 5 MB (large files belong in a release asset). The shared dev certificate comes from the build
+      # tools (SEC-11).
+      run: external/winui-app-kit/scripts/devkit precommit --max-size 5MB
+
+    - name: no strong-name keys
+      # Signing keys devkit's check does not know (SEC-11).
+      glob: "*.snk"
+      run: 'echo "Signing material must not be committed: {staged_files}" && exit 1'
+
+    - name: no credential folders
+      # Folders devkit's check does not cover: cloud credentials and the build tools' local signing.
+      glob: "{.aws/**,.windows-build/**}"
+      run: 'echo "Credentials must not be committed: {staged_files}" && exit 1'
+
+    - name: no settings files
+      # A user's settings.json must never be committed (SEC-1, CONF-5).
+      glob: "**/settings.json"
+      exclude:
+        - ".claude/settings.json"
+        - ".vscode/settings.json"
+      run: 'echo "App data files must not be committed: {staged_files}" && exit 1'

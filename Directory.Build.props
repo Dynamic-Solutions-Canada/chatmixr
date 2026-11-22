@@ -1,0 +1,10 @@
+<Project>
+  <!-- The family's shared build properties (KIT-6, PLAT-3, STYLE-6, STYLE-7): platform auto-detect,
+       nullable and language settings, analyzers, warnings as errors in Release and CI, security floors. -->
+  <Import Project="$(MSBuildThisFileDirectory)external/winui-app-kit/build/WinUIAppKit.props" />
+
+  <!-- Single source of truth for the app version (REL-1) -->
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+</Project>
