@@ -9,7 +9,9 @@
 </p>
 
 <p align="center">
-  <a href="#get-it">In development: build it yourself</a>
+  <a href="https://apps.microsoft.com/detail/9N3F55DFWLQP">
+    <img src="https://get.microsoft.com/images/en-us%20dark.svg" alt="Download ChatMixr from the Microsoft Store" height="56">
+  </a>
 </p>
 
 <p align="center">
@@ -36,7 +38,7 @@ For anyone whose voice chat and game sound fight over the same headphones. Windo
 
 ## Get it
 
-ChatMixr is in development and not yet released. To build and install it yourself, follow the [development guide](docs/development.md).
+Get ChatMixr from the **[Microsoft Store](https://apps.microsoft.com/detail/9N3F55DFWLQP)**. It installs and stays up to date automatically. To build it yourself instead, follow the [development guide](docs/development.md).
 
 ChatMixr collects no telemetry or crash reports.
 
@@ -53,7 +55,7 @@ ChatMixr collects no telemetry or crash reports.
 
 ## Languages
 
-English, French, German, Japanese, Portuguese (Brazil), Simplified Chinese and Spanish.
+English (United States and Canada), Spanish, French (France and Canada), German, Simplified Chinese, Brazilian Portuguese and Japanese.
 
 ## Developers
 
