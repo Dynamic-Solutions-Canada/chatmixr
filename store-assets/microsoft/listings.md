@@ -47,8 +47,8 @@ Translated wording uses the same terms as the in-app catalogs (`ChatMixr/Localiz
 
 ## Screenshots
 
-Five, in caption order: the tray popup, the mix popup above the taskbar, the Devices page, the Chat apps page and the Settings page, all in dark mode, captured from the real installed app on the test VM with a lent receiver and emulated devices; `store-assets/README.md` lists the capture steps, and `store-assets/manifest.json` holds the files, order and alt text (LIST-8). English captures serve every listing.
+Six, in caption order. First, a generated hero in each locale (D-123): the headline and subline from `heroHeadline` and `heroSubline`, beside the real tray popup, enlarged; its caption is the subline, and it claims only what the listing says (the slider per device, the tray, Xbox Game Bar and keyboard shortcuts). Then the tray popup, the mix popup above the taskbar, the Devices page, the Chat apps page and the Settings page, all in dark mode, captured from the real installed app on the test VM with a lent receiver and emulated devices; `store-assets/README.md` lists the capture steps, and `store-assets/manifest.json` holds the files, order and alt text (LIST-8). English captures serve every listing; the hero's text is translated.
 
 ## Open questions
 
-- Recapture screenshot 00 once the winui-app-kit flyout fix is pinned: until then the tray popup touches the screen edge.
+- Recapture the tray popup (screenshot 01, the hero's source) at 200% for a sharper hero, and once the winui-app-kit flyout fix is pinned: until then the tray popup touches the screen edge.

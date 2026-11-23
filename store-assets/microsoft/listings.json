@@ -30,12 +30,15 @@
         "audio mixer"
       ],
       "screenshotCaptions": [
+        "A Game to Chat slider for every device: in the tray, in Xbox Game Bar, or with a keyboard shortcut.",
         "The tray popup: a Game to Chat slider for every device, with the headset's wheel and battery.",
         "Turn the wheel or press a shortcut and a popup shows the balance.",
         "Devices: your order, Switch to, test sounds and hidden devices.",
         "Chat apps: set up in-game voice chat, and search your installed apps to add a chat app.",
         "Settings: automatic switching, shortcuts for the mix, language and theme."
-      ]
+      ],
+      "heroHeadline": "Balance game and chat audio on any headset.",
+      "heroSubline": "A Game to Chat slider for every device: in the tray, in Xbox Game Bar, or with a keyboard shortcut."
     },
     "en-CA": {
       "copyFrom": "en-US"
@@ -69,12 +72,15 @@
         "mezclador de audio"
       ],
       "screenshotCaptions": [
+        "Un control de Juego a Chat para cada dispositivo: en la bandeja, en Xbox Game Bar o con un atajo de teclado.",
         "La ventana de la bandeja: un control de Juego a Chat para cada dispositivo, con la rueda y la batería de los auriculares.",
         "Gira la rueda o pulsa un atajo y una ventana emergente muestra el equilibrio.",
         "Dispositivos: tu orden, «Cambiar a», sonidos de prueba y dispositivos ocultos.",
         "Aplicaciones de chat: configura el chat de voz de los juegos y busca entre tus aplicaciones instaladas para añadir una aplicación de chat.",
         "Configuración: cambio automático, atajos para la mezcla, idioma y tema."
-      ]
+      ],
+      "heroHeadline": "Equilibra el sonido del juego y del chat en cualquier auricular.",
+      "heroSubline": "Un control de Juego a Chat para cada dispositivo: en la bandeja, en Xbox Game Bar o con un atajo de teclado."
     },
     "fr-FR": {
       "title": "ChatMixr",
@@ -105,12 +111,15 @@
         "mixeur audio"
       ],
       "screenshotCaptions": [
+        "Un curseur Jeu-Discussion pour chaque périphérique : dans la zone de notification, dans Xbox Game Bar ou avec un raccourci clavier.",
         "La fenêtre de la zone de notification : un curseur entre Jeu et Discussion pour chaque périphérique, avec la molette et la batterie du casque.",
         "Tournez la molette ou appuyez sur un raccourci : une fenêtre affiche l'équilibre.",
         "Périphériques : votre ordre, « Passer à », les sons de test et les périphériques masqués.",
         "Applications de discussion : configurez la discussion vocale en jeu et recherchez dans vos applications installées pour ajouter une application de discussion.",
         "Paramètres : changement automatique, raccourcis pour le mixage, langue et thème."
-      ]
+      ],
+      "heroHeadline": "Équilibrez le son du jeu et de la discussion sur n'importe quel casque.",
+      "heroSubline": "Un curseur Jeu-Discussion pour chaque périphérique : dans la zone de notification, dans Xbox Game Bar ou avec un raccourci clavier."
     },
     "fr-CA": {
       "copyFrom": "fr-FR"
@@ -144,12 +153,15 @@
         "Lautstärkemixer"
       ],
       "screenshotCaptions": [
+        "Ein Spiel-Chat-Regler für jedes Gerät: im Tray-Popup, in der Xbox Game Bar oder per Tastenkombination.",
         "Das Tray-Popup: ein Schieberegler zwischen Spiel und Chat für jedes Gerät, mit Rad und Akkustand des Headsets.",
         "Rad drehen oder Tastenkombination drücken, und ein Popup zeigt die Balance.",
         "Geräte: Ihre Reihenfolge, „Wechseln zu“, Testtöne und ausgeblendete Geräte.",
         "Chat-Apps: In-Game-Sprachchat einrichten und installierte Apps durchsuchen, um eine Chat-App hinzuzufügen.",
         "Einstellungen: automatischer Gerätewechsel, Tastenkombinationen für die Mischung, Sprache und Design."
-      ]
+      ],
+      "heroHeadline": "Spiel- und Chat-Ton auf jedem Headset ausbalancieren.",
+      "heroSubline": "Ein Spiel-Chat-Regler für jedes Gerät: im Tray-Popup, in der Xbox Game Bar oder per Tastenkombination."
     },
     "zh-CN": {
       "title": "ChatMixr",
@@ -180,12 +192,15 @@
         "混音器"
       ],
       "screenshotCaptions": [
+        "每个设备都有“游戏”到“聊天”滑块：在托盘中、在 Xbox Game Bar 中，或用键盘快捷键。",
         "托盘弹出窗口：每个设备都有“游戏”到“聊天”滑块，并显示耳机的滚轮和电量。",
         "转动滚轮或按下快捷键，弹窗就会显示当前的平衡。",
         "设备：自定义顺序、“切换到”、测试声音和隐藏的设备。",
         "聊天应用：设置游戏内语音聊天，并搜索已安装的应用来添加聊天应用。",
         "设置：自动切换、混音快捷键、语言和主题。"
-      ]
+      ],
+      "heroHeadline": "在任何耳机上平衡游戏和聊天声音。",
+      "heroSubline": "每个设备都有“游戏”到“聊天”滑块：在托盘中、在 Xbox Game Bar 中，或用键盘快捷键。"
     },
     "pt-BR": {
       "title": "ChatMixr",
@@ -216,12 +231,15 @@
         "mixer de áudio"
       ],
       "screenshotCaptions": [
+        "Um controle de Jogo a Chat para cada dispositivo: na bandeja, na Xbox Game Bar ou com um atalho de teclado.",
         "O pop-up da bandeja: um controle de Jogo a Chat para cada dispositivo, com a roda e a bateria do headset.",
         "Gire a roda ou pressione um atalho e um pop-up mostra o equilíbrio.",
         "Dispositivos: sua ordem, “Mudar para”, sons de teste e dispositivos ocultos.",
         "Apps de chat: configure o chat de voz dos jogos e pesquise seus apps instalados para adicionar um app de chat.",
         "Configurações: troca automática, atalhos para a mixagem, idioma e tema."
-      ]
+      ],
+      "heroHeadline": "Equilibre o som do jogo e do chat em qualquer headset.",
+      "heroSubline": "Um controle de Jogo a Chat para cada dispositivo: na bandeja, na Xbox Game Bar ou com um atalho de teclado."
     },
     "ja-JP": {
       "title": "ChatMixr",
@@ -252,12 +270,15 @@
         "音量ミキサー"
       ],
       "screenshotCaptions": [
+        "デバイスごとの「ゲーム」から「チャット」へのスライダーを、トレイ、Xbox Game Bar、キーボード ショートカットから。",
         "トレイのポップアップ：デバイスごとの「ゲーム」から「チャット」へのスライダーと、ヘッドセットのホイールやバッテリー残量。",
         "ホイールを回すかショートカットを押すと、ポップアップでバランスを表示。",
         "デバイス：好みの順序、「切り替え」、テスト音、非表示のデバイス。",
         "チャット アプリ：ゲーム内ボイス チャットの設定と、インストール済みのアプリを検索してチャット アプリを追加。",
         "設定：自動切り替え、ミックスのショートカット、言語とテーマ。"
-      ]
+      ],
+      "heroHeadline": "どのヘッドセットでも、ゲームとチャットの音量バランスを調整。",
+      "heroSubline": "デバイスごとの「ゲーム」から「チャット」へのスライダーを、トレイ、Xbox Game Bar、キーボード ショートカットから。"
     }
   }
 }

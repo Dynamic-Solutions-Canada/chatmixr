@@ -75,9 +75,10 @@ Source is authoritative in WSL, with submodules initialised (`git submodule upda
 | `npm run check:l10n` | The kit's catalog check: keys, placeholders, no em dashes, no app `kit.` keys | That the text is translated well |
 | `npm test` | Every harness under `tests/` passes on Linux: the mixing rules and the settings file | Anything needing Windows or the headsets (see each README) |
 | `npm run check:notices` | The notices file matches the restored packages, and About links to its real path | That licences were read right |
-| `npm run validate` | The Linux gate: format, gitignore, icon, l10n, listing, notices and screenshot checks, then `npm test` | A Windows compile; also run `verify:desktop` |
+| `npm run validate` | The Linux gate: format, gitignore, icon, l10n, listing, notices, screenshot and hero checks, then `npm test` | A Windows compile; also run `verify:desktop` |
 | `npm run format` | Rewrites C# outside `external/` to the kit's style | Behaviour |
 | `npm run icons` | Writes every app icon from `assets/brand/` (devkit; `check:icons` in `validate` compares them) | How the icon looks; check it on a light and a dark taskbar |
+| `npm run hero` | Draws the first Store screenshot in every listing locale (devkit; `check:hero` in `validate` compares the pixels) | That the text reads well; the maintainer approves new heroes |
 
 Before finishing a change, run `npm run validate` and `npm run verify:desktop` (the `desktop` skill).
 
