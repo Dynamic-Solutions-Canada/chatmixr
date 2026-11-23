@@ -1,5 +1,7 @@
 {
   "AppDescription": "Balance game and chat audio on any headset, with a slider or your Arctis ChatMix wheel, without SteelSeries GG.",
+  "GameBarWidgetDescription": "Balance game and chat without leaving your game.",
+  "GameBarWidgetName": "ChatMixr",
   "cable-ready.rename": "Give the cable clear names",
   "cable-ready.rename-note": "Shows as \"ChatMixr Voice Chat\" in games, and \"ChatMixr internal, do not choose\" among microphones. Off restores VB-Cable's names.",
   "cable-setup.open-page": "Open VB-Audio's page",
@@ -141,5 +143,7 @@
   "volume.level": "{{level}}%",
   "volume.mute": "Mute",
   "volume.name": "Volume of {{device}}",
-  "volume.unmute": "Unmute"
+  "volume.unmute": "Unmute",
+  "widget.connecting": "Starting ChatMixr…",
+  "widget.not-running": "ChatMixr isn't running."
 }

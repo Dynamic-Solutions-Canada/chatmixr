@@ -13,6 +13,13 @@
     <ApplicationIcon>Resources\ChatMixr.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <!-- App.xaml is packaged as Tray/App.xbf, never at the package root. Windows' UWP XAML loads any
+       App.xaml at the root by itself, so the Game Bar widget (UWP, same package) would load this WinUI 3
+       one and crash. This app loads its App.xaml by its own address, so the move costs it nothing. -->
+  <ItemGroup>
+    <ApplicationDefinition Update="App.xaml" Link="Tray\App.xaml" />
+  </ItemGroup>
+
   <!-- Shared tray / flyout / settings plumbing (git submodule) -->
   <ItemGroup>
     <ProjectReference Include="..\external\winui-app-kit\WinUIAppKit\WinUIAppKit.csproj" />

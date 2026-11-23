@@ -4,8 +4,9 @@
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  IgnorableNamespaces="uap desktop rescap">
+  IgnorableNamespaces="uap uap3 desktop rescap">
 
   <!-- The Store identity reserved in Partner Center (Store ID 9N3F55DFWLQP), also store_identity and
        store_publisher in windows-build.json. Signed dev builds are stamped with dev_identity and the
@@ -26,6 +27,8 @@
     <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.26100.0" />
     <!-- Keep in step with the Microsoft.WindowsAppSDK version winui-app-kit pins (build/WinUIAppKit.Packages.props at the kit tag); its release notes give the runtime MinVersion. -->
     <PackageDependency Name="Microsoft.WindowsAppRuntime.2" MinVersion="2.7.0.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
+    <!-- The Game Bar widget's SDK (Microsoft.Gaming.XboxGameBar.dll) is C++ built for app containers. -->
+    <PackageDependency Name="Microsoft.VCLibs.140.00" MinVersion="14.0.33519.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
   </Dependencies>
 
   <!-- Interface languages: keep in step with ChatMixr/Classes/AppLanguages.cs and Localization/Catalogs/*.json
@@ -60,9 +63,128 @@
         <desktop:Extension Category="windows.startupTask">
           <desktop:StartupTask TaskId="ChatMixrStartup" Enabled="true" DisplayName="ChatMixr" />
         </desktop:Extension>
+        <!-- chatmixr: starts ChatMixr in the tray. The Game Bar widget's Open ChatMixr uses the
+             full-trust launcher first and opens this link through Game Bar only as a fallback
+             (WidgetPipe.OpenUri); any other use only starts ChatMixr, which is harmless. -->
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="chatmixr" />
+        </uap:Extension>
+      </Extensions>
+    </Application>
+    <!-- The Xbox Game Bar widget (ChatMixr.GameBar): a UWP app Game Bar starts by protocol activation.
+         Not in the Start menu. It shows and changes the running ChatMixr's mix over a local pipe. -->
+    <Application Id="GameBar"
+      Executable="ChatMixr.GameBar.exe"
+      EntryPoint="ChatMixr.GameBar.App">
+      <uap:VisualElements
+        DisplayName="ms-resource:Resources/GameBarWidgetName"
+        BackgroundColor="transparent"
+        Square150x150Logo="Images\Square150x150Logo.png"
+        Square44x44Logo="Images\Square44x44Logo.png"
+        Description="ms-resource:Resources/GameBarWidgetDescription"
+        AppListEntry="none" />
+      <Extensions>
+        <!-- Open ChatMixr starts the tray app with this (FullTrustProcessLauncher), quietly in the tray.
+             Unlike opening a link through Game Bar, it doesn't dismiss Game Bar's overlay. -->
+        <desktop:Extension Category="windows.fullTrustProcess" Executable="ChatMixr.exe">
+          <desktop:FullTrustProcess>
+            <desktop:ParameterGroup GroupId="Quiet" Parameters="--silent" />
+          </desktop:FullTrustProcess>
+        </desktop:Extension>
+        <!-- Name is Game Bar's contract and must be spelled exactly so; PublicFolder is required. -->
+        <uap3:Extension Category="windows.appExtension">
+          <uap3:AppExtension Name="microsoft.gameBarUIExtension"
+            Id="ChatMixrWidget"
+            DisplayName="ms-resource:Resources/GameBarWidgetName"
+            Description="ms-resource:Resources/GameBarWidgetDescription"
+            PublicFolder="GameBar">
+            <uap3:Properties>
+              <GameBarWidget Type="Standard">
+                <HomeMenuVisible>true</HomeMenuVisible>
+                <PinningSupported>true</PinningSupported>
+                <ActivateAfterInstall>false</ActivateAfterInstall>
+                <Window>
+                  <Size>
+                    <Height>360</Height>
+                    <Width>340</Width>
+                    <MinHeight>200</MinHeight>
+                    <MinWidth>280</MinWidth>
+                    <MaxHeight>720</MaxHeight>
+                    <MaxWidth>480</MaxWidth>
+                  </Size>
+                  <ResizeSupported>
+                    <Horizontal>true</Horizontal>
+                    <Vertical>true</Vertical>
+                  </ResizeSupported>
+                </Window>
+              </GameBarWidget>
+            </uap3:Properties>
+          </uap3:AppExtension>
+        </uap3:Extension>
       </Extensions>
     </Application>
   </Applications>
+
+  <!-- The Game Bar SDK's registrations; redo both on each SDK update. Its classes, in
+       Microsoft.Gaming.XboxGameBar.dll, as its NuGet readme gives them. Metadata-based marshaling for its
+       private interfaces (Path must name a file in the package but is unused for this class id), listed
+       from the SDK's private winmd by ChatMixr.GameBar/list-private-interfaces.ps1, not from the readme:
+       7.3.2607010's readme gives IXboxGameBarWidgetNotificationHost another interface's id. -->
+  <Extensions>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>Microsoft.Gaming.XboxGameBar.dll</Path>
+        <ActivatableClass ActivatableClassId="Microsoft.Gaming.XboxGameBar.XboxGameBarForegroundWorker" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Gaming.XboxGameBar.XboxGameBarWidgetControl" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Gaming.XboxGameBar.XboxGameBarWidget" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Gaming.XboxGameBar.XboxGameBarWidgetNotificationManager" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Gaming.XboxGameBar.XboxGameBarWidgetRecordingManager" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Gaming.XboxGameBar.XboxGameBarWidgetActivity" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Gaming.XboxGameBar.Input.XboxGameBarHotkeyWatcher" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Gaming.XboxGameBar.XboxGameBarAppTargetTracker" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Gaming.XboxGameBar.XboxGameBarWidgetNotificationBuilder" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Gaming.XboxGameBar.Authentication.XboxGameBarWebAuthenticationBroker" ThreadingModel="both" />
+      </InProcessServer>
+    </Extension>
+    <Extension Category="windows.activatableClass.proxyStub">
+      <ProxyStub ClassId="00000355-0000-0000-C000-000000000046">
+        <Path>Microsoft.Gaming.XboxGameBar.winmd</Path>
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarAppTargetHost" InterfaceId="38CDC43C-0A0E-4B3B-BBD3-A581AE220D53" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarAppTargetInfo" InterfaceId="D7689E93-5587-47D1-A42E-78D16B2FA807" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarAppTargetInfo2" InterfaceId="68930F3C-2FDF-44D3-A052-A417EA54CD98" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarHotkeyManagerHost" InterfaceId="F6225A53-B34C-4833-9511-AA377B43316F" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarNavigationKeyCombo" InterfaceId="5EEA3DBF-09BB-42A5-B491-CF561E33C172" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetActivatedEventArgsPrivate" InterfaceId="782535A7-9407-4572-BFCB-316B4086F102" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetActivityHost" InterfaceId="2B113C9B-E370-49B2-A20B-83E0F5737577" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetAuthHost" InterfaceId="DC263529-B12F-469E-BB35-B94069F5B15A" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetControlHost" InterfaceId="C309CAC7-8435-4082-8F37-784523747047" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetForegroundWorkerHost" InterfaceId="DDB52B57-FA83-420C-AFDE-6FA556E18B83" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetForegroundWorkerPrivate" InterfaceId="42BACDFC-BB28-4E71-99B4-24C034C7B7E0" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetHost" InterfaceId="5D12BC93-212B-4B9F-9091-76B73BF56525" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetHost10" InterfaceId="3284F0E0-F506-481F-88D3-9DDF6C02B56B" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetHost2" InterfaceId="28717C8B-D8E8-47A8-AF47-A1D5263BAE9B" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetHost3" InterfaceId="3F5A3F12-C1E4-4942-B80D-3117BC948E29" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetHost4" InterfaceId="FA696D9E-2501-4B01-B26F-4BB85344740F" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetHost5" InterfaceId="A6C878CC-2B08-4B94-B1C3-222C6A913F3C" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetHost6" InterfaceId="CE6F0D73-C44F-4BBD-9652-A0FC52C37A34" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetHost7" InterfaceId="B7D246E1-F61B-43A2-9120-25D9AC31BB17" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetHost8" InterfaceId="0E4A1F7C-3D5B-4E8C-8F2A-6D9A0B2E5F7C" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetHost9" InterfaceId="BC40A15A-6961-4D04-A9CD-34680A0F5ACD" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetNotificationHost" InterfaceId="6F68D392-E4A9-46F7-A024-5275BC2FE7BA" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetNotificationPrivate" InterfaceId="C94C8DC8-C8B5-4560-AF6E-A588B558213A" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetNotificationPrivate2" InterfaceId="A7E3B2D1-4F8C-4A6E-9D2B-1C5E8F3A7B90" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetPrivate" InterfaceId="22ABA97F-FB0F-4439-9BDD-2C67B2D5AA8F" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetPrivate2" InterfaceId="B2F7DB8C-7540-48DA-9B46-4E60CE0D9DEB" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetPrivate3" InterfaceId="4FB89FB6-7CB8-489D-8408-2269E6C733A1" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetPrivate4" InterfaceId="5638D65A-3733-48CC-90E5-984688D62786" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetPrivate5" InterfaceId="73B9289B-812C-4FA4-979B-180770DC92B3" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetPrivate6" InterfaceId="687766A8-6A24-4691-ADDC-88AA57582B47" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetRecordingHost" InterfaceId="E85FD1C6-2867-44C3-B00A-AEEBBA76E438" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetRecordingHost2" InterfaceId="B33C864A-F353-43AA-B518-AF5DB4FB6B4B" />
+        <Interface Name="Microsoft.Gaming.XboxGameBar.Private.IXboxGameBarWidgetRecordingResultSummaryPrivate" InterfaceId="7D701751-288D-4C6C-A466-97FBA0D21111" />
+      </ProxyStub>
+    </Extension>
+  </Extensions>
 
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />

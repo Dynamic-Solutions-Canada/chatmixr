@@ -4,7 +4,8 @@
     "windows": {
       "images": "ChatMixrMSIX/Images",
       "ico": "ChatMixr/Resources/ChatMixr.ico",
-      "tiles": false
+      "tiles": false,
+      "gameBarIcons": "ChatMixrMSIX/GameBarIcons"
     }
   }
 }

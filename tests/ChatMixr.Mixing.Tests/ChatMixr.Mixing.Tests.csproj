@@ -19,5 +19,7 @@
     <Compile Include="../../ChatMixr/Models/ReceiverReport.cs" Link="Linked/ReceiverReport.cs" />
     <Compile Include="../../ChatMixr/Models/Shortcut.cs" Link="Linked/Shortcut.cs" />
     <Compile Include="../../ChatMixr/Models/DefaultRoles.cs" Link="Linked/DefaultRoles.cs" />
+    <Compile Include="../../ChatMixr/Models/WidgetProtocol.cs" Link="Linked/WidgetProtocol.cs" />
+    <Compile Include="../../ChatMixr/Models/AppContainerSid.cs" Link="Linked/AppContainerSid.cs" />
   </ItemGroup>
 </Project>

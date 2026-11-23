@@ -2,6 +2,18 @@
   "project": "ChatMixr/ChatMixr.csproj",
   "package_script": "external/winui-app-kit/build/build-msix.ps1",
   "msix_dir": "ChatMixrMSIX",
+  "extra_folders": [
+    { "source": "ChatMixrMSIX/GameBarIcons", "destination": "GameBar/Icons" }
+  ],
+  "companions": [
+    {
+      "project": "ChatMixr.GameBar/ChatMixr.GameBar.csproj",
+      "builder": "msbuild",
+      "requires": ["Microsoft.VisualStudio.ComponentGroup.UWP.BuildTools"],
+      "xaml": true,
+      "files": ["ChatMixr.GameBar.exe", "Microsoft.Gaming.XboxGameBar.dll", "Microsoft.Gaming.XboxGameBar.winmd", "Microsoft.Gaming.XboxGameBar.Private.winmd"]
+    }
+  ],
   "manifest_strings": {
     "catalog_dir": "ChatMixr/Localization/Catalogs"
   },
@@ -16,6 +28,7 @@
   "store_identity_switch": "-StoreIdentity",
   "localization": {
     "catalog_dir": "ChatMixr/Localization/Catalogs",
+    "source_dirs": ["ChatMixr", "ChatMixr.GameBar"],
     "extra_key_patterns": [
       "DescriptionKey\\s*=\\s*\"([^\"]+)\"",
       "LabelKey\\s*=\\s*\"([^\"]+)\"",

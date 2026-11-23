@@ -1,5 +1,7 @@
 {
   "AppDescription": "SteelSeries GG なしで、スライダーまたは Arctis の ChatMix ホイールを使って、どのヘッドセットでもゲームとチャットの音量バランスを調整できます。",
+  "GameBarWidgetDescription": "ゲームを離れずにゲームとチャットのバランスを調整できます。",
+  "GameBarWidgetName": "ChatMixr",
   "cable-ready.rename": "ケーブルにわかりやすい名前を付ける",
   "cable-ready.rename-note": "ゲームでは「ChatMixr Voice Chat」、マイクの一覧では「ChatMixr internal, do not choose」と表示されます。オフで VB-Cable の名前に戻ります。",
   "cable-setup.open-page": "VB-Audio のページを開く",
@@ -141,5 +143,7 @@
   "volume.level": "{{level}}%",
   "volume.mute": "ミュート",
   "volume.name": "{{device}} の音量",
-  "volume.unmute": "ミュート解除"
+  "volume.unmute": "ミュート解除",
+  "widget.connecting": "ChatMixr を起動しています…",
+  "widget.not-running": "ChatMixr は実行されていません。"
 }

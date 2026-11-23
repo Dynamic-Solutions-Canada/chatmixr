@@ -12,7 +12,11 @@ namespace ChatMixr.Classes;
 public static class AppLanguages
 {
     /// <summary>The supported set, in picker order.</summary>
-    public static SupportedLanguages Supported { get; } = new("en-US",
+    /// <remarks>
+    /// An explicitly typed array, not a bare collection expression: the Game Bar widget links this
+    /// file, and CsWinRT's AOT check rejects collection expressions that target an interface (CsWinRT1032).
+    /// </remarks>
+    public static SupportedLanguages Supported { get; } = new("en-US", ((string Identity, string Catalog, string NativeName)[])
     [
         ("en-US", "en-US", "English (United States)"),
         ("en-CA", "en-US", "English (Canada)"),

@@ -73,7 +73,7 @@ jobs:
             echo "windows=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          pattern='^(ChatMixr/|ChatMixrMSIX/|external/|\.gitmodules$|Directory\.(Build\.props|Build\.targets|Packages\.props)$|global\.json$|ChatMixr\.slnx$|\.github/workflows/ci\.yml$)'
+          pattern='^(ChatMixr/|ChatMixr\.GameBar/|ChatMixrMSIX/|external/|\.gitmodules$|Directory\.(Build\.props|Build\.targets|Packages\.props)$|global\.json$|ChatMixr\.slnx$|\.github/workflows/ci\.yml$)'
           if git diff --name-only "${BASE}" HEAD | grep -Eq "${pattern}"; then
             echo "windows=true" >> "$GITHUB_OUTPUT"
           else
@@ -111,3 +111,25 @@ jobs:
         run: |
           dotnet build ChatMixr/ChatMixr.csproj -c Debug "-p:Platform=$env:PLATFORM"
           if ($LASTEXITCODE -ne 0) { throw "Compile failed ($env:PLATFORM)" }
+
+      # The Game Bar widget is UWP: its XAML compiler ships only with Visual Studio's UWP tools, so it
+      # builds with Visual Studio's MSBuild, found through vswhere. Debug, so it proves the compile but
+      # not the Native AOT link that packaging does.
+      - name: Compile the Game Bar widget
+        shell: pwsh
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          # The UWP XAML compiler comes with Visual Studio's UWP tools: the UWP.BuildTools group in
+          # Build Tools (the build VM), or the Universal workload in the full Visual Studio (the hosted
+          # runners). Fail if neither is installed, so the widget is never skipped silently.
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+          $vs = $null
+          foreach ($uwp in @("Microsoft.VisualStudio.ComponentGroup.UWP.BuildTools", "Microsoft.VisualStudio.Workload.Universal")) {
+            $vs = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild $uwp -property installationPath
+            if ($vs) { break }
+          }
+          if (-not $vs) { throw "No Visual Studio installation with the UWP tools on this runner" }
+          $rid = if ($env:PLATFORM -eq "ARM64") { "win-arm64" } else { "win-x64" }
+          & (Join-Path $vs "MSBuild\Current\Bin\amd64\MSBuild.exe") ChatMixr.GameBar/ChatMixr.GameBar.csproj -restore -p:Configuration=Debug "-p:Platform=$env:PLATFORM" "-p:RuntimeIdentifier=$rid" -v:minimal -nologo
+          if ($LASTEXITCODE -ne 0) { throw "Widget compile failed ($env:PLATFORM)" }

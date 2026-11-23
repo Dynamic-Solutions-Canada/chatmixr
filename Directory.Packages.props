@@ -6,4 +6,11 @@
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)external/winui-app-kit/build/WinUIAppKit.Packages.props" />
+
+  <!-- The Game Bar widget's SDK (ChatMixr.GameBar). Its licence requires acceptance; see THIRD-PARTY-NOTICES. -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Gaming.XboxGameBar" Version="7.3.2607010" />
+    <!-- Generates the widget's C# projection of the Game Bar SDK's winmd. -->
+    <PackageVersion Include="Microsoft.Windows.CsWinRT" Version="2.3.1" />
+  </ItemGroup>
 </Project>
