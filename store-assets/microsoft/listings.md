@@ -31,7 +31,7 @@ Translated wording uses the same terms as the in-app catalogs (`ChatMixr/Localiz
 - Privacy: no account, ads, analytics or telemetry. Settings and logs are local. The only network request is the "Our other apps" catalogue, when that page opens; "Check for updates" opens the Store's updates page.
 - Not made by or affiliated with SteelSeries. "ChatMix", SteelSeries and Arctis are named only to say what the app works with.
 - The interface is in English, Spanish, French, German, Simplified Chinese, Brazilian Portuguese and Japanese, following Windows or a choice in Settings.
-- Requires Windows 11 (the manifest's minimum version, 10.0.22000).
+- Requires Windows 10 (22H2) or Windows 11 (the manifest's minimum version, 10.0.19045.5011).
 
 ## Console-only fields
 
