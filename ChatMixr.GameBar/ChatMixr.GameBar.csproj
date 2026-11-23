@@ -1,0 +1,81 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    The Xbox Game Bar widget: a UWP XAML app (Game Bar hosts only UWP views, not WinUI 3), shipped
+    as a second <Application> in ChatMixr's package. It has no audio access of its own; it shows and
+    changes the running tray app's mix over a local pipe (Models/WidgetProtocol.cs).
+    Modern .NET UWP (UseUwp), Native AOT; building it needs Visual Studio's "UWP build tools"
+    (Microsoft.VisualStudio.ComponentGroup.UWP.BuildTools), which supplies the UWP XAML compiler.
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!-- UWP projections need a 26100 SDK target; the package floor stays 22000 (PLAT-6). -->
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.22000.0</TargetPlatformMinVersion>
+    <UseUwp>true</UseUwp>
+    <UseUwpTools>true</UseUwpTools>
+    <!-- Its code lives in GameBar/ (where its XAML must be), so that folder is the ChatMixr.GameBar namespace. -->
+    <RootNamespace>ChatMixr</RootNamespace>
+    <AssemblyName>ChatMixr.GameBar</AssemblyName>
+    <Platforms>x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <Configurations>Debug;Release</Configurations>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <PublishAot>true</PublishAot>
+    <DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
+    <!-- Packed by the kit's build-msix.ps1 into ChatMixr's package, not as its own MSIX. -->
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <GenerateAppxPackageOnBuild>false</GenerateAppxPackageOnBuild>
+    <AppxPackage>false</AppxPackage>
+    <!-- The Game Bar SDK ships a UAP 10.0 winmd; CsWinRT generates its C# projection here. -->
+    <AssetTargetFallback>$(AssetTargetFallback);uap10.0</AssetTargetFallback>
+    <CsWinRTIncludes>Microsoft.Gaming.XboxGameBar</CsWinRTIncludes>
+    <!-- CsWinRT's generator only runs on Windows, so on Linux this project can't compile: the kit's
+         format check gives it whitespace only, and its Windows build enforces code style. -->
+    <WinUIAppKitFormatWhitespaceOnly>true</WinUIAppKitFormatWhitespaceOnly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- runtime excluded: its assets use win10-<arch> ids, copied by hand below. -->
+    <PackageReference Include="Microsoft.Gaming.XboxGameBar" GeneratePathProperty="true" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Windows.CsWinRT" />
+    <!-- CsWinRT only projects winmds it is given: name the SDK's public one. -->
+    <CsWinRTInputs Include="$(PkgMicrosoft_Gaming_XboxGameBar)\lib\uap10.0\Microsoft.Gaming.XboxGameBar.winmd" />
+  </ItemGroup>
+
+  <!--
+    Shared with the tray app, linked rather than referenced (the tray app is WinUI 3): the pipe's
+    messages and slider rules, and the kit's dependency-free text lookup over the same catalogs.
+  -->
+  <ItemGroup>
+    <Compile Include="..\ChatMixr\Models\WidgetProtocol.cs" Link="Linked\WidgetProtocol.cs" />
+    <Compile Include="..\ChatMixr\Models\MixLevels.cs" Link="Linked\MixLevels.cs" />
+    <Compile Include="..\ChatMixr\Classes\AppLanguages.cs" Link="Linked\AppLanguages.cs" />
+    <Compile Include="..\external\winui-app-kit\WinUIAppKit\Localization\TextCatalogs.cs" Link="Linked\TextCatalogs.cs" />
+    <Compile Include="..\external\winui-app-kit\WinUIAppKit\Localization\SupportedLanguages.cs" Link="Linked\SupportedLanguages.cs" />
+    <EmbeddedResource Include="..\ChatMixr\Localization\Catalogs\*.json" LogicalName="ChatMixr.Localization.%(Filename).json" />
+  </ItemGroup>
+
+  <!--
+    The widget's XAML lives in GameBar/, so its compiled XAML is at ms-appx:///GameBar/... in the
+    package and can't collide with ChatMixr's own App.xbf at the package root.
+  -->
+  <ItemGroup>
+    <Page Remove="GameBar\App.xaml" />
+    <ApplicationDefinition Include="GameBar\App.xaml" />
+  </ItemGroup>
+
+  <!-- The SDK's native implementation is under runtimes/win10-<arch>, which .NET's portable RID graph
+       no longer matches, so it is copied by hand beside the widget. -->
+  <PropertyGroup>
+    <GameBarArch Condition="'$(Platform)' == 'ARM64'">arm64</GameBarArch>
+    <GameBarArch Condition="'$(Platform)' != 'ARM64'">x64</GameBarArch>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="$(PkgMicrosoft_Gaming_XboxGameBar)\runtimes\win10-$(GameBarArch)\native\Microsoft.Gaming.XboxGameBar.dll" Link="Microsoft.Gaming.XboxGameBar.dll" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="$(PkgMicrosoft_Gaming_XboxGameBar)\lib\uap10.0\Microsoft.Gaming.XboxGameBar.winmd" Link="Microsoft.Gaming.XboxGameBar.winmd" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The private winmd describes the SDK's private interfaces, which Windows marshals from metadata
+         (the manifest's proxyStub). Without it beside the DLL, creating XboxGameBarWidget fails with
+         0x8000000F, "Typename or Namespace was not found in metadata file". The SDK's own packaging adds it. -->
+    <Content Include="$(PkgMicrosoft_Gaming_XboxGameBar)\private\Microsoft.Gaming.XboxGameBar.Private.winmd" Link="Microsoft.Gaming.XboxGameBar.Private.winmd" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

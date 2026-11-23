@@ -1,5 +1,7 @@
 {
   "AppDescription": "无需 SteelSeries GG，即可通过滑块或 Arctis 的 ChatMix 滚轮，在任何耳机上平衡游戏和聊天声音。",
+  "GameBarWidgetDescription": "无需离开游戏，即可平衡游戏和聊天声音。",
+  "GameBarWidgetName": "ChatMixr",
   "cable-ready.rename": "为音频线使用清晰的名称",
   "cable-ready.rename-note": "在游戏中显示为“ChatMixr Voice Chat”，在麦克风中显示为“ChatMixr internal, do not choose”。关闭后恢复 VB-Cable 的名称。",
   "cable-setup.open-page": "打开 VB-Audio 页面",
@@ -141,5 +143,7 @@
   "volume.level": "{{level}}%",
   "volume.mute": "静音",
   "volume.name": "{{device}} 的音量",
-  "volume.unmute": "取消静音"
+  "volume.unmute": "取消静音",
+  "widget.connecting": "正在启动 ChatMixr…",
+  "widget.not-running": "ChatMixr 未运行。"
 }

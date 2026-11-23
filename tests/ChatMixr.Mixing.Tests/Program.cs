@@ -52,6 +52,9 @@ var scenarios = new List<(string Name, Action Body)>
     ("a baseline saved by a run that crashed wins over the scaled volume found at start", SavedBaselineWins),
     ("a new session of a known program starts from its existing baseline", SecondSessionSharesBaseline),
     ("after restoring, only restored baselines are forgotten; a closed app's baseline is kept", ForgetRestored),
+    ("the Game Bar widget's state and commands survive the pipe, one line each", WidgetMessagesRoundTrip),
+    ("the tray app drops widget commands that are malformed, oversize or name no device", WidgetRejectsBadCommands),
+    ("a package's sandbox SID is worked out from its name the way Windows does", AppContainerSidMatchesWindows),
 };
 
 foreach (var (name, body) in scenarios)
@@ -551,6 +554,44 @@ void ForgetRestored()
     Check(set == null && Near(tracker.Baselines[Key("game")], 0.5f), "the next run reads the restored app's level afresh");
 }
 
+// ── Game Bar widget pipe ────────────────────────────────────────────────
+
+static void WidgetMessagesRoundTrip()
+{
+    var state = new WidgetState(
+        "fr-FR",
+        "Mixage sur 1 appareil",
+        [new WidgetDevice("{0.0.0.00000000}.{a}", "Casque \"Nova\"", "\uE7F6", true, true, -40, "On · 79%", false)],
+        new WidgetVoiceChat(true, "Voice chat", "Pick CABLE Input"),
+        new WidgetLabels("Switch to", "In use", "Game", "Chat", "Set by the wheel"));
+
+    string line = WidgetPipe.Encode(state);
+    Check(!line.Contains('\n'), "a state is one line, so the reader can split on newlines");
+    var back = WidgetPipe.DecodeState(line);
+    Check(back is { Language: "fr-FR", Devices.Count: 1, VoiceChat.On: true }, "the state comes back whole");
+    Check(back!.Devices[0] == state.Devices[0] && back.Labels == state.Labels, "devices and labels survive, quotes and all");
+    Check(WidgetPipe.DecodeState(WidgetPipe.Encode(state with { VoiceChat = null }))!.VoiceChat == null, "no cable means no voice chat switch");
+
+    var slider = WidgetPipe.DecodeCommand(WidgetPipe.Encode(new WidgetCommand(WidgetCommand.Slider, "dev", -35)));
+    Check(slider == new WidgetCommand(WidgetCommand.Slider, "dev", -35), "a slider command survives");
+    var voice = WidgetPipe.DecodeCommand(WidgetPipe.Encode(new WidgetCommand(WidgetCommand.VoiceChat, On: true)));
+    Check(voice is { Op: WidgetCommand.VoiceChat, On: true }, "a voice chat command needs no device");
+}
+
+static void WidgetRejectsBadCommands()
+{
+    Check(WidgetPipe.DecodeCommand("not json") == null, "text that isn't JSON is dropped");
+    Check(WidgetPipe.DecodeCommand("{\"op\":\"format-disk\"}") == null, "an unknown command is dropped");
+    Check(WidgetPipe.DecodeCommand("{\"op\":\"slider\",\"position\":10}") == null, "a slider command without a device is dropped");
+    Check(WidgetPipe.DecodeCommand("{\"op\":\"switch\",\"deviceId\":\"\"}") == null, "a switch to an empty id is dropped");
+    Check(WidgetPipe.DecodeCommand("null") == null, "a JSON null is dropped");
+
+    string huge = "{\"op\":\"switch\",\"deviceId\":\"" + new string('x', WidgetPipe.MaxLineChars) + "\"}";
+    Check(WidgetPipe.DecodeCommand(huge) == null, "a line past the limit is dropped unread");
+    Check(WidgetPipe.DecodeState("[]") == null, "a state line of the wrong shape is dropped");
+    Check(WidgetPipe.Name(1) != WidgetPipe.Name(2), "each Windows session has its own pipe");
+}
+
 // ── Helpers ─────────────────────────────────────────────────────────────
 
 static MixLevels? Wheel(byte[] report) => ReceiverReport.Parse(report) is ReceiverReport.Wheel wheel ? wheel.Levels : null;
@@ -567,4 +608,12 @@ static void Check(bool condition, string what)
     {
         throw new Exception(what);
     }
+}
+
+static void AppContainerSidMatchesWindows()
+{
+    // Reported by Windows' DeriveAppContainerSidFromAppContainerName (outside the package) on 2026-11-22.
+    const string Windows = "S-1-15-2-4252323268-1284870702-3891924070-2623001089-1217809038-424659308-2402436006";
+    Check(AppContainerSid.FromName("TechnicallyReal.ChatMixr_gfb69tsnc4jnp") == Windows, "the dev package's SID matches Windows'");
+    Check(AppContainerSid.FromName("technicallyreal.chatmixr_gfb69tsnc4jnp") == Windows, "case doesn't matter, as in Windows");
 }

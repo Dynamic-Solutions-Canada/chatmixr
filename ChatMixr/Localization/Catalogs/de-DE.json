@@ -1,5 +1,7 @@
 {
   "AppDescription": "Gleichen Sie Spiel- und Chat-Ton auf jedem Headset aus, mit einem Schieberegler oder dem ChatMix-Rad Ihres Arctis, ohne SteelSeries GG.",
+  "GameBarWidgetDescription": "Spiel und Chat ausgleichen, ohne das Spiel zu verlassen.",
+  "GameBarWidgetName": "ChatMixr",
   "cable-ready.rename": "Dem Kabel klare Namen geben",
   "cable-ready.rename-note": "Erscheint in Spielen als „ChatMixr Voice Chat“ und unter Mikrofonen als „ChatMixr internal, do not choose“. Aus stellt die Namen von VB-Cable wieder her.",
   "cable-setup.open-page": "VB-Audio-Seite öffnen",
@@ -141,5 +143,7 @@
   "volume.level": "{{level}} %",
   "volume.mute": "Stummschalten",
   "volume.name": "Lautstärke von {{device}}",
-  "volume.unmute": "Stummschaltung aufheben"
+  "volume.unmute": "Stummschaltung aufheben",
+  "widget.connecting": "ChatMixr wird gestartet…",
+  "widget.not-running": "ChatMixr läuft nicht."
 }

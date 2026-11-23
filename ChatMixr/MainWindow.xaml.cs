@@ -42,6 +42,7 @@ public sealed partial class MainWindow : Window
     private readonly MixFlyout _flyout;
     private static OsdWindow? _osd;
     private static MixShortcuts? _shortcuts;
+    private readonly WidgetLink _widget;
     private readonly global::Windows.UI.ViewManagement.UISettings _uiSettings = new();
 
     /// <summary>
@@ -56,12 +57,35 @@ public sealed partial class MainWindow : Window
             return true;
         }
 
-        if (!Startup.IsSilentLaunch())
+        if (!IsQuietLaunch())
         {
             SingleInstance.SignalRunningInstance(HostTitle, ShowMessageName);
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// True when this launch starts in the tray without opening the main window: a sign-in launch, or
+    /// the Game Bar widget's Open ChatMixr (a <c>chatmixr:</c> link), since the user is in a game and
+    /// the widget fills in as soon as ChatMixr is up.
+    /// </summary>
+    private static bool IsQuietLaunch()
+    {
+        if (Startup.IsSilentLaunch())
+        {
+            return true;
+        }
+
+        try
+        {
+            return Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().GetActivatedEventArgs().Kind
+                == Microsoft.Windows.AppLifecycle.ExtendedActivationKind.Protocol;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public MainWindow()
@@ -142,7 +166,11 @@ public sealed partial class MainWindow : Window
         _shortcuts.Pressed += DeviceActions.StepInUse;
         ApplyShortcuts();
 
+        // The Game Bar widget, served over a pipe only this package's sandboxed widget can open.
+        _widget = new WidgetLink(Engine, new WidgetServer(DispatcherQueue));
+
         _host.AddExitStep("save settings", SettingsManager.Save);
+        _host.AddExitStep("disconnect the Game Bar widget", _widget.Dispose);
         _host.AddExitStep("release the shortcuts", _shortcuts.Dispose);
         _host.AddExitStep("put app volumes back", Engine.Dispose);
         _host.AddExitStep("remove the tray icon", _tray.Dispose);
@@ -163,7 +191,7 @@ public sealed partial class MainWindow : Window
         {
             MixerWindow.ShowSettings();
         }
-        else if (!Startup.IsSilentLaunch() || SettingsManager.IsFirstRun)
+        else if (!IsQuietLaunch() || SettingsManager.IsFirstRun)
         {
             MixerWindow.ShowInstance();
         }

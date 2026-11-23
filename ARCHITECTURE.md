@@ -1,5 +1,5 @@
 > **Scope:** How ChatMixr works: its threads and passes, mixing, Windows' default devices, in-game voice chat, and the product rules people also read.
-> **Governs:** `ChatMixr/Services/**`, `ChatMixr/Models/**`, `ChatMixr/Classes/DeviceActions.cs`, `ChatMixr/Classes/DeviceList.cs`, `ChatMixr/Classes/ChatDeviceSetup.cs`, `ChatMixr/Classes/MixShortcuts.cs`
+> **Governs:** `ChatMixr/Services/**`, `ChatMixr/Models/**`, `ChatMixr/Classes/DeviceActions.cs`, `ChatMixr/Classes/DeviceList.cs`, `ChatMixr/Classes/ChatDeviceSetup.cs`, `ChatMixr/Classes/MixShortcuts.cs`, `ChatMixr/Classes/WidgetLink.cs`, `ChatMixr.GameBar/**`
 
 # Architecture
 
@@ -65,6 +65,13 @@ A search of installed apps (Start menu shortcuts, uninstall entries and packages
 ## Test sounds
 
 A Test button on the device in use plays a game sound (a low pulsing hum) and a chat sound (a two-note chime every 1.5 s) continuously, together, until stopped, so the slider or wheel can be heard moving the balance (`Services/TestPlayer.cs`, `Models/TestSignal.cs`). The game sound plays on the device at its game level; the chat sound goes through the cable when that device is separating chat (so hearing it proves the route), otherwise on the device at its chat level. One device tests at a time; exit stops it.
+
+## Game Bar widget
+
+- **What it shows:** a widget in Xbox Game Bar (Win+G) shows the popup's devices (Switch to, the Game-to-Chat slider, read-only on a wheel device) and the in-game voice chat switch, in ChatMixr's own words and language.
+- **How it reaches ChatMixr:** it is a sandboxed UWP app in ChatMixr's package with no audio access. The running tray app serves it over a named pipe, one per Windows session, whose access list allows only the user and, among sandboxed apps, this package, with a low integrity label so the widget can write to it (`Services/WidgetServer.cs`; the design is in [docs/game-bar-widget.md](docs/game-bar-widget.md)). Inside an installed package Windows was seen to return no SID for the package, so ChatMixr works it out from the package name (`Models/AppContainerSid.cs`, pinned by a test). A failure to serve the pipe only disables the widget.
+- **Commands are checked:** each is checked against the current snapshot (a listed device, not a wheel device's slider, Switch to only where the popup offers it) and carried out through `DeviceActions`, like the popup's controls.
+- **Not running:** the widget says so and offers Open ChatMixr, which starts it quietly in the tray through the package's full-trust launcher (`--silent`); a protocol launch would close Game Bar. It never starts ChatMixr on its own.
 
 ## Planned, not built: ChatMixr's own virtual devices
 

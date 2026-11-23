@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="ChatMixr/ChatMixr.csproj" />
+  <Project Path="ChatMixr.GameBar/ChatMixr.GameBar.csproj" />
   <Project Path="external/winui-app-kit/WinUIAppKit/WinUIAppKit.csproj" />
 </Solution>

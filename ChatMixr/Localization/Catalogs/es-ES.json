@@ -1,5 +1,7 @@
 {
   "AppDescription": "Equilibra el sonido del juego y del chat en cualquier auricular, con un control deslizante o la rueda ChatMix de tus Arctis, sin SteelSeries GG.",
+  "GameBarWidgetDescription": "Equilibra el juego y el chat sin salir de tu partida.",
+  "GameBarWidgetName": "ChatMixr",
   "cable-ready.rename": "Dar al cable nombres claros",
   "cable-ready.rename-note": "Aparece como «ChatMixr Voice Chat» en los juegos y como «ChatMixr internal, do not choose» entre los micrófonos. Desactivado restaura los nombres de VB-Cable.",
   "cable-setup.open-page": "Abrir la página de VB-Audio",
@@ -141,5 +143,7 @@
   "volume.level": "{{level}} %",
   "volume.mute": "Silenciar",
   "volume.name": "Volumen de {{device}}",
-  "volume.unmute": "Activar el sonido"
+  "volume.unmute": "Activar el sonido",
+  "widget.connecting": "Iniciando ChatMixr…",
+  "widget.not-running": "ChatMixr no se está ejecutando."
 }

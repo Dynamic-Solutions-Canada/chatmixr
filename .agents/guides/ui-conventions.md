@@ -39,6 +39,10 @@ This app's own interface conventions. The shared family rules are in the standar
 - Every ChatMixr switch is a `LabeledSwitch` (`LabelKey` set to a catalog key in the page's code, not XAML, so the catalog check sees it; `HelpKey` likewise for an optional help icon whose text shows on hover and in a panel on click): the switch, then its label beside it, wrapping when long and toggling when clicked, never a header above with "On"/"Off" (a ToggleSwitch's own content can't wrap and overflows the popup). The kit's Settings rows keep their own layout, so they never share a card with `LabeledSwitch`es: on the Settings page the Startup row has the General card to itself and ChatMixr's switches sit in "Devices and shortcuts".
 - Options switched in more than one place (auto-switch, shortcuts) go through `AppOptions`, which raises `Changed` so every place shows the same state.
 
+## Game Bar widget
+
+The widget (`ChatMixr.GameBar/`) is UWP, so none of the kit's or this app's WinUI 3 rows, styles or badges reach it. It mirrors the popup's card instead: icon, name, caption (the headset's state, then what plays), Switch to on the right (In use on the device in use, disabled for a headset that's off), and the Game-to-Chat slider below, read-only on a wheel device with the wheel's tooltip. Every word it shows while connected comes from the tray app (`Classes/WidgetLink.cs`), so wording changes belong there or in the catalogs, never in the widget. Game Bar draws the frame and title; the widget follows Game Bar's theme, not ChatMixr's. Its styles live in `WidgetPage.xaml` (`WidgetSecondaryText` for captions, the status line and In use; `DeviceRow` is handed it), never in its `App.xaml`: Windows' UWP XAML only auto-loads an `App.xaml` at the package root, so the widget's is never loaded. That root must stay empty, which is why ChatMixr's own `App.xaml` is packaged as `Tray/App.xbf` (`ChatMixr.csproj`); a WinUI 3 `App.xaml` at the root crashes the widget.
+
 ## Text
 
 - Visible text follows the catalog rule under "Conventions and gotchas" in [AGENTS.md](../../AGENTS.md).
