@@ -41,7 +41,7 @@ Formatting and tests run through winui-app-kit's `scripts/dotnet`, which uses th
 
 ### CI
 
-`ci.yml` runs `npm run validate` on Linux for every push to `main` and every pull request. It also compiles the app on Windows for x64 and ARM64 (Debug, the same compile as `verify:desktop`) when app source, packaging, submodules or build configuration changed, and the Game Bar widget with Visual Studio's MSBuild (not yet run on a GitHub runner). `codeql.yml` scans the C# code and the workflows on each push, each pull request and weekly, leaving out `external/`. Dependabot proposes grouped NuGet and GitHub Actions updates weekly; the Windows App SDK and NLog move with winui-app-kit instead.
+`ci.yml` runs `npm run validate` on Linux for every push to `main` and every pull request. It also compiles the app on Windows for x64 and ARM64 (Debug, the same compile as `verify:desktop`) when app source, packaging, submodules or build configuration changed, and the Game Bar widget with Visual Studio's MSBuild (Debug: the compile, not the Native AOT link; the hosted image's Visual Studio has the UWP tools through its Universal workload). `codeql.yml` scans the C# code and the workflows on each push, each pull request and weekly, leaving out `external/`. Dependabot proposes grouped NuGet and GitHub Actions updates weekly; the Windows App SDK and NLog move with winui-app-kit instead.
 
 ### Manual checks in the installed app
 
