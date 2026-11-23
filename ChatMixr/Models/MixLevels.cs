@@ -44,7 +44,7 @@ public static class SliderMix
     public const int Min = -100, Max = 100;
 
     /// <summary>How close to the middle a dragged slider snaps to it, like a wheel's centre detent.</summary>
-    public const int Detent = 5;
+    public const int Detent = 2;
 
     /// <summary>
     /// A dragged position with the centre detent applied: within <see cref="Detent"/> of the middle it

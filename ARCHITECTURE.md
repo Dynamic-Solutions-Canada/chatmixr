@@ -18,7 +18,7 @@ The area table in [AGENTS.md](AGENTS.md#architecture) says which file owns what.
 - **Virtual devices are never shown:** any software device (VB-Cable, Sonar's) is left out of the lists and mixing; ChatMixr manages the cable itself. A device is software when its audio adapter is enumerated by `ROOT` or `SWD` (the endpoint's undocumented adapter property), not by its container: Windows puts the PC's own hardware (onboard and laptop speakers, their microphones) in the same container as software devices. Without that property, the container decides.
 - **Hidden devices** are taken out of both lists (Hide on the page's cards and in every card's right-click menu) and listed on the Devices page with Show. They are still mixed at their slider's position.
 - **Order:** the user's order, by endpoint id, from dragging in the popup or the Devices page, or Move up and Move down on the page. Devices not connected keep their place; new ones go last, in Windows' order.
-- **Centre detent:** a dragged slider within 5 of the middle snaps to it.
+- **Centre detent:** a dragged slider within 2 of the middle snaps to it.
 - **Volume row:** the tray popup shows the in-use device's own volume and mute (Windows' endpoint volume), read fresh with each snapshot so keyboard volume keys and Windows' own slider show within a second.
 
 ## Mixing

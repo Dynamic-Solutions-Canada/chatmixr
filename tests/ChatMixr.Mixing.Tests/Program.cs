@@ -132,13 +132,13 @@ void SliderLevels()
     static string Fill(string key, (string Name, object? Value)[] values) =>
         key + ":" + string.Join(",", values.Select(v => $"{v.Name}={v.Value}"));
     Check(SliderMix.LevelsText(-40.4, Fill) == "slider.levels:game=100,chat=60", "the drag bubble says the levels, not the raw position");
-    Check(SliderMix.LevelsText(3, Fill) == "slider.levels:game=100,chat=100", "the drag bubble shows the detent's levels");
+    Check(SliderMix.LevelsText(2, Fill) == "slider.levels:game=100,chat=100", "the drag bubble shows the detent's levels");
 }
 
 void SliderDetent()
 {
-    Check(SliderMix.Snap(3) == 0 && SliderMix.Snap(-5) == 0, "within the detent snaps to the middle");
-    Check(SliderMix.Snap(6) == 6 && SliderMix.Snap(-40) == -40, "outside it stays put");
+    Check(SliderMix.Snap(1) == 0 && SliderMix.Snap(-2) == 0, "within the detent snaps to the middle");
+    Check(SliderMix.Snap(3) == 3 && SliderMix.Snap(-40) == -40, "outside it stays put");
     Check(SliderMix.Snap(250) == SliderMix.Max, "out of range is clamped");
 }
 
@@ -225,7 +225,7 @@ void ShortcutSteps()
 {
     Check(SliderMix.Step(0, +1) == 10 && SliderMix.Step(0, -1) == -10, "one step each way from the middle");
     Check(SliderMix.Step(-5, +1) == 0 && SliderMix.Step(4, -1) == 0, "passing through the middle stops at it");
-    Check(SliderMix.Step(15, -1) == 0 && SliderMix.Step(16, -1) == 6, "a step ending within the detent lands on the middle");
+    Check(SliderMix.Step(12, -1) == 0 && SliderMix.Step(13, -1) == 3, "a step ending within the detent lands on the middle");
     Check(SliderMix.Step(95, +1) == SliderMix.Max && SliderMix.Step(-100, -1) == SliderMix.Min, "the ends stop it");
 }
 
