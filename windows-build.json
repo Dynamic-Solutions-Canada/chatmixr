@@ -9,7 +9,7 @@
     {
       "project": "ChatMixr.GameBar/ChatMixr.GameBar.csproj",
       "builder": "msbuild",
-      "requires": ["Microsoft.VisualStudio.ComponentGroup.UWP.BuildTools"],
+      "requires": [["Microsoft.VisualStudio.ComponentGroup.UWP.BuildTools", "Microsoft.VisualStudio.Workload.Universal"]],
       "xaml": true,
       "files": ["ChatMixr.GameBar.exe", "Microsoft.Gaming.XboxGameBar.dll", "Microsoft.Gaming.XboxGameBar.winmd", "Microsoft.Gaming.XboxGameBar.Private.winmd"]
     }
