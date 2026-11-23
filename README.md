@@ -60,7 +60,8 @@ English (United States and Canada), Spanish, French (France and Canada), German,
 ## Developers
 
 - [Development guide](docs/development.md): building, checking, manual checks, and where the app stores data.
-- [Agent instructions](AGENTS.md): architecture, behaviour rules and conventions.
+- [Agent instructions](AGENTS.md): the code map, the rules a change can break, and conventions.
+- [Architecture](ARCHITECTURE.md): how mixing, devices, headsets and in-game voice chat work, and the [receiver protocol](docs/protocol.md).
 - [UI conventions](.agents/guides/ui-conventions.md): how the windows, popups and cards are built.
 
 ## License
