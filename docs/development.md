@@ -76,6 +76,7 @@ The harnesses cannot see the screen, the receivers or Windows' mixer. Before a r
 - A settings file that can't be read (replace `settings.json` with text that isn't JSON, then start the app): the window opens on Settings with the "settings were reset" notice naming the `.bad` backup.
 - Light, dark and high contrast.
 - Game Bar widget: press Win+G, open ChatMixr from the Widget menu. It lists the popup's devices in the same order and words; dragging a slider moves that device's mix (Windows' volume mixer follows) and the tray popup's slider follows; a wheel device's slider is greyed and follows the wheel; Switch to moves the device in use; the in-game voice chat switch matches the popup's. Change ChatMixr's language: the widget follows. Exit ChatMixr: within a few seconds the widget says ChatMixr isn't running; Open ChatMixr starts it and the widget reconnects. Pin the widget and check it over a full-screen game.
+- Windows 10 22H2 (the `windows10-test` VM, with an emulated sound card from a compose override so a playback device exists): it installs and starts; the tray icon is among the hidden icons and opens the popup from there; the Devices page's Hide shows a minus (Windows 10's icon font has no struck-through eye); a mix shortcut shows the mix popup with square corners on a solid background; the Game Bar widget lists the device and connects. Windows 11 keeps acrylic, rounded corners and the struck-through eye.
 
 ## Releases
 

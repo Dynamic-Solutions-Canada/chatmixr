@@ -8,9 +8,11 @@
   -->
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <!-- UWP projections need a 26100 SDK target; the package floor stays 22000 (PLAT-6). -->
+    <!-- UWP projections need a 26100 SDK target. The minimum must name a Windows SDK platform that UWP's
+         XAML compiler knows (error WMC0902 otherwise), and Windows 10 22H2 (19045) shares the 19041 SDK;
+         the package's actual floor is the manifest's MinVersion (PLAT-6). -->
     <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.22000.0</TargetPlatformMinVersion>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     <UseUwp>true</UseUwp>
     <UseUwpTools>true</UseUwpTools>
     <!-- Its code lives in GameBar/ (where its XAML must be), so that folder is the ChatMixr.GameBar namespace. -->

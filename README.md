@@ -44,12 +44,13 @@ ChatMixr collects no telemetry or crash reports.
 
 ### Requirements
 
-- Windows 11.
+- Windows 10 (22H2) or Windows 11.
 - Any playback device for the sliders. For a wheel: a SteelSeries Arctis Nova 7 family headset and receiver. Tested with the Nova 7X and Nova 7X Gen 2; other Nova 7 models use the same wheel report and should work, but are untested.
 - For game voice chat: [VB-Cable](https://vb-audio.com/Cable/), free from VB-Audio, installed by you.
 
 ## Good to know
 
+- On Windows 10, ChatMixr's tray icon may start among the hidden icons (the arrow next to the clock). Drag it onto the taskbar to keep it in view.
 - With an Arctis headset, Sonar must be off (in SteelSeries GG, or exit GG), because it sends your apps' sound to its own devices instead of the headset.
 - Apps are told apart by program, so a chat in a browser tab is mixed with everything else that browser plays, unless the chat service can send its sound to the virtual cable. Use the chat service's desktop app otherwise.
 

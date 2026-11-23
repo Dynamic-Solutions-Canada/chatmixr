@@ -108,9 +108,7 @@ public sealed partial class MainWindow : Window
             SettingsManager.Current.AutoSwitchHeadsets,
             SettingsManager.Current.CallsDevice);
         _flyout = new MixFlyout(Engine);
-        _osd = new OsdWindow();
-        // Never activated, so WinUI's shutdown would wait for it; the host closes it before exiting.
-        HostWindow.CloseOnExit(_osd);
+        _osd = new OsdWindow();   // its OsdController registers it with HostWindow.CloseOnExit
         Engine.WheelTurned += ShowMix;
         Engine.AutoSwitched += ShowSwitch;
         SettingsManager.WasReset += () =>
