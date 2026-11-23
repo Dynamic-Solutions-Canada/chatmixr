@@ -6,7 +6,7 @@ ChatMixr is a resident WinUI 3 tray app that balances chat apps against everythi
 
 This repo follows the shared standards at https://github.com/Dynamic-Solutions-Canada/app-standards: read [stacks/windows.md](https://github.com/Dynamic-Solutions-Canada/app-standards/blob/main/stacks/windows.md), then the topic file for the area you are changing. If `external/standards/` exists, it is the same content pinned for offline use. Where this file differs from the standards, this file wins and says why.
 
-**Store: live.** ChatMixr 1.0.0 is in the Microsoft Store (Store ID 9N3F55DFWLQP, identity `DynamicSolutionsCA.ChatMixr`, BRAND-6, registered in the standards' registry, BRAND-10). The listing, screenshots and release notes live in `store-assets/` and `release-notes/`, checked in `validate`. **Still missing:** the release and Store workflows (`build-msix.yml`, `store-publish.yml`, `credential-expiry.yml`) and the `release` skill (DIST-4, REL-6, LIST-9). Until they exist, a submission is entered by hand in Partner Center from `store-assets/microsoft/listings.json`. The privacy policy page lives in the website repository (`privacy/chatmixr.php`).
+**Store: live.** ChatMixr 1.0.0 is in the Microsoft Store (Store ID 9N3F55DFWLQP, identity `DynamicSolutionsCA.ChatMixr`, BRAND-6, registered in the standards' registry, BRAND-10). The listing, screenshots and release notes live in `store-assets/` and `release-notes/`, checked in `validate`. Releases go through the `release` skill and the `build-msix.yml` and `store-publish.yml` workflows (DIST-4, REL-6, LIST-9). The privacy policy page lives in the website repository (`privacy/chatmixr.php`).
 
 ## Architecture
 
@@ -90,6 +90,7 @@ Before finishing a change, run `npm run validate` and `npm run verify:desktop` (
 | [WinUI App Kit README](external/winui-app-kit/README.md) | Using any kit API or shared XAML | `external/winui-app-kit/**` (read only) |
 | [Windows build tools README](https://github.com/Dynamic-Solutions-Canada/windows-build-tools) | A Windows build, install or packaging problem | `windows-build.json`, the kit's `scripts/windows-build` |
 | `desktop` skill | Building, verifying or installing locally | Local Windows builds |
+| `release` skill | Releasing a version: notes, bump, tag, the Release and the Store draft | `release-notes/**`, `<Version>`, tags |
 
 ## Keeping docs current
 

@@ -1,6 +1,6 @@
 # Microsoft Store listing text
 
-`listings.json` is the listing text in the shared `schemaVersion: 1` / `locales` shape (LIST-3), for the app's nine locale identities: `en-US`, `en-CA`, `es-ES`, `fr-FR`, `fr-CA`, `de-DE`, `zh-CN`, `pt-BR` and `ja-JP` (the same set the package manifest declares). Seven records hold wording; `en-CA` is `{ "copyFrom": "en-US" }` and `fr-CA` is `{ "copyFrom": "fr-FR" }`, matching the app's own catalogs. Fields are semantic names, not Partner Center CSV field IDs. Until the Store workflow reads it, a submission is entered by hand from it (LIST-9).
+`listings.json` is the listing text in the shared `schemaVersion: 1` / `locales` shape (LIST-3), for the app's nine locale identities: `en-US`, `en-CA`, `es-ES`, `fr-FR`, `fr-CA`, `de-DE`, `zh-CN`, `pt-BR` and `ja-JP` (the same set the package manifest declares). Seven records hold wording; `en-CA` is `{ "copyFrom": "en-US" }` and `fr-CA` is `{ "copyFrom": "fr-FR" }`, matching the app's own catalogs. Fields are semantic names, not Partner Center CSV field IDs. No publisher reads this file: the Store workflow uploads packages and release notes only, so listing changes are entered by hand in Partner Center from it (LIST-9).
 
 Release notes are not in this file. Each version's "What's new" text is `release-notes/<version>.md` (`en-US`) plus one `release-notes/<version>.<identity>.md` per other wording catalog (REL-6, LIST-10).
 
@@ -40,7 +40,7 @@ Translated wording uses the same terms as the in-app catalogs (`ChatMixr/Localiz
 | Store ID | 9N3F55DFWLQP (https://apps.microsoft.com/detail/9N3F55DFWLQP) |
 | Package identity | `DynamicSolutionsCA.ChatMixr`, publisher `CN=B55B96A5-F10C-49D3-8D0B-7260EDBE7625`, family `DynamicSolutionsCA.ChatMixr_3y7xdm7hdtb94` |
 | Category | Utilities & tools |
-| Pricing | US $0.99 with a 7-day free trial, set in Partner Center |
+| Pricing | US $0.99 (Partner Center tier `Tier1012`, the `price_tier` in `store-publish.yml`) with a 7-day free trial, set in Partner Center |
 | Markets | All 240 markets Partner Center offers (it lists no Lebanon or Western Sahara), set in Partner Center |
 | Age rating | IARC questionnaire: all other app types, No to every question; "Online content" is No because "Our other apps" only lists the publisher's own Store-rated apps |
 | Privacy policy URL | https://www.dynamic-solutions.ca/privacy/chatmixr (D-017); live since 2026-11-22 |

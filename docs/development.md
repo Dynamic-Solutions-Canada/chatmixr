@@ -76,7 +76,12 @@ The harnesses cannot see the screen, the receivers or Windows' mixer. Before a r
 
 ## Releases
 
-Not automated yet: a release is submitted by hand in Partner Center from `store-assets/microsoft/listings.json`. The release and Store workflows and the `release` skill replace this section when they land.
+Releases follow the `release` skill (`.agents/skills/release/SKILL.md`, REL-12): approved notes in `release-notes/`, `Bump version to vX.Y.Z`, an annotated tag pushed with `main`. The tag runs two workflows:
+
+- **Build and Package** (`build-msix.yml`): the gate, x64 and ARM64 packages signed with a throwaway certificate, then a GitHub Release titled `ChatMixr X.Y.Z` from the notes. It attaches no packages, because ChatMixr is a paid app in a public repo (DIST-5).
+- **Publish to Microsoft Store** (`store-publish.yml`, the kit's reusable workflow): uploads both architectures to Partner Center as a draft with the notes (REL-7). Submitting the draft is the maintainer's manual run with `submit_draft`. `credential-expiry.yml` warns weekly from 60 days before the Store secret expires.
+
+1.0.0 was submitted by hand before these workflows existed; its `v1.0.0` tag and Release were added afterwards, on the first commit whose tree matches the submitted package.
 
 ## Where the app stores data
 
