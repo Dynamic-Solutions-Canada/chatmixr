@@ -102,7 +102,7 @@ internal static class MixVisuals
 
     /// <summary>
     /// What to do while the virtual chat device is on: pick it, by its full name as games and chat
-    /// apps list it, as the voice output.
+    /// apps list it, as voice chat's output (only voice chat goes there; game sound stays put).
     /// </summary>
     public static string VirtualChatInstruction(string cableName) =>
         UiText.Format("in-game-chat.instruction", ("cable", cableName));
