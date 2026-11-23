@@ -1,0 +1,10 @@
+{
+  "background": "#17181D",
+  "targets": {
+    "windows": {
+      "images": "ChatMixrMSIX/Images",
+      "ico": "ChatMixr/Resources/ChatMixr.ico",
+      "tiles": false
+    }
+  }
+}

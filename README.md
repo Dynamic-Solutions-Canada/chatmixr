@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="ChatMixrMSIX/Images/Square150x150Logo.png" alt="ChatMixr" width="120">
+  <img src="assets/generated/icon-256.png" alt="ChatMixr" width="120">
 </p>
 
 <h1 align="center">ChatMixr</h1>
