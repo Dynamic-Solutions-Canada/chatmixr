@@ -87,7 +87,7 @@ internal static class DeviceList
         };
         private readonly TextBlock _gameLabel = new() { VerticalAlignment = VerticalAlignment.Center };
         private readonly TextBlock _chatLabel = new() { VerticalAlignment = VerticalAlignment.Center, TextAlignment = TextAlignment.Right };
-        private readonly MenuFlyoutItem _hideItem = new() { Icon = new FontIcon { Glyph = "" } };
+        private readonly MenuFlyoutItem _hideItem = new() { Icon = new FontIcon { Glyph = MixVisuals.HideGlyph } };
         private readonly Button _test;
 
         /// <summary>Segoe Fluent Icons: Play and Stop, for the Test button.</summary>
@@ -130,7 +130,7 @@ internal static class DeviceList
             {
                 _up = IconButton("", "", "", () => DeviceActions.Move(DeviceId, -1));
                 _down = IconButton("", "", "", () => DeviceActions.Move(DeviceId, 1));
-                _hide = IconButton("", "", "", () => DeviceActions.Hide(DeviceId));
+                _hide = IconButton(MixVisuals.HideGlyph, "", "", () => DeviceActions.Hide(DeviceId));
                 Actions.Children.Add(_up);
                 Actions.Children.Add(_down);
                 Actions.Children.Add(_hide);

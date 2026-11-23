@@ -24,7 +24,8 @@
   </Properties>
 
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.26100.0" />
+    <!-- Windows 10 22H2 from build 19045.5011, and Windows 11: the family floor decided in the standards (D-018). -->
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19045.5011" MaxVersionTested="10.0.26100.0" />
     <!-- Keep in step with the Microsoft.WindowsAppSDK version winui-app-kit pins (build/WinUIAppKit.Packages.props at the kit tag); its release notes give the runtime MinVersion. -->
     <PackageDependency Name="Microsoft.WindowsAppRuntime.2" MinVersion="2.7.0.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
     <!-- The Game Bar widget's SDK (Microsoft.Gaming.XboxGameBar.dll) is C++ built for app containers. -->

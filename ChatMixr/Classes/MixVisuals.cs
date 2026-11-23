@@ -1,4 +1,5 @@
 using ChatMixr.Models;
+using Microsoft.Win32;
 using WinUIAppKit.Localization;
 
 namespace ChatMixr.Classes;
@@ -9,6 +10,35 @@ namespace ChatMixr.Classes;
 /// </summary>
 internal static class MixVisuals
 {
+    /// <summary>
+    /// The Hide action's glyph: Segoe Fluent Icons' Hide (an eye struck through) where that font is
+    /// installed, as on every Windows 11; otherwise Segoe MDL2 Assets' Remove (a minus), since Windows 10's
+    /// icon font has no Hide and the glyph would draw as an empty box. Every other glyph ChatMixr uses
+    /// exists in both fonts (checked on Windows 10 22H2).
+    /// </summary>
+    public static string HideGlyph => _hideGlyph ??= HasFluentIcons() ? "\uED1A" : "\uE738";
+
+    private static string? _hideGlyph;
+
+    /// <summary>
+    /// True when Segoe Fluent Icons is installed, for everyone or for this user (Windows 10 users can
+    /// add it). Decided by the font, not the Windows build, since that is what draws the glyph.
+    /// </summary>
+    private static bool HasFluentIcons()
+    {
+        const string fonts = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts";
+        foreach (var hive in new[] { Registry.LocalMachine, Registry.CurrentUser })
+        {
+            using var key = hive.OpenSubKey(fonts);
+            if (key?.GetValueNames().Any(name => name.StartsWith("Segoe Fluent Icons", StringComparison.OrdinalIgnoreCase)) == true)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>Segoe Fluent Icons glyphs for each kind of device.</summary>
     public static string Glyph(OutputKind kind) => kind switch
     {
