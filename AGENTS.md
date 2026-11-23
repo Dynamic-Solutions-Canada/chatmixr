@@ -22,7 +22,6 @@ This repo follows the shared standards at https://github.com/Dynamic-Solutions-C
 | Tray icon artwork | `Classes/TrayIconRenderer.cs` |
 | Mixing: audio thread, passes, devices, receivers, restore on exit | `Services/MixEngine.cs` |
 | Windows' default devices | `Services/DefaultDevices.cs` (reads and switches), `Services/AudioPolicy.cs` (the calls); what a switch moves in `Models/DefaultRoles.cs` |
-| Shut down, restart and sign-out run the exit steps | `Classes/SessionEnd.cs` |
 | The guided VB-Cable setup | `Classes/ChatDeviceSetup.cs` |
 | The on-screen mix and switch popup | `Windows/OsdWindow.xaml(.cs)` |
 | Styles for rows, badges and notes built in code | `Styles/RowStyles.xaml`, `Classes/CardRow.cs`, `Classes/Pill.cs` |

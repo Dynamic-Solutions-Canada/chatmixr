@@ -1,5 +1,5 @@
 > **Scope:** How ChatMixr works: its threads and passes, mixing, Windows' default devices, in-game voice chat, and the product rules people also read.
-> **Governs:** `ChatMixr/Services/**`, `ChatMixr/Models/**`, `ChatMixr/Classes/DeviceActions.cs`, `ChatMixr/Classes/DeviceList.cs`, `ChatMixr/Classes/ChatDeviceSetup.cs`, `ChatMixr/Classes/MixShortcuts.cs`, `ChatMixr/Classes/SessionEnd.cs`
+> **Governs:** `ChatMixr/Services/**`, `ChatMixr/Models/**`, `ChatMixr/Classes/DeviceActions.cs`, `ChatMixr/Classes/DeviceList.cs`, `ChatMixr/Classes/ChatDeviceSetup.cs`, `ChatMixr/Classes/MixShortcuts.cs`
 
 # Architecture
 
@@ -26,7 +26,7 @@ The area table in [AGENTS.md](AGENTS.md#architecture) says which file owns what.
 - **Factors:** on each device, chat apps (the editable list, matched by program name without `.exe`) get the chat factor and every other app the game factor. Factor = (level / 100)², a starting point to tune by ear. Windows' system sounds and ChatMixr itself are left alone.
 - **Apps' own volumes are kept:** ChatMixr sets baseline × factor, never an absolute level. The baseline is an app's level before ChatMixr touched it; a level ChatMixr did not set is the user's change in Windows' mixer and becomes the new baseline. Baselines are saved in `volume-baselines.json` so a crash doesn't turn a scaled level into a baseline, and a clean exit puts every reachable app back and forgets those baselines.
 - **A wheel device isn't scaled until its receiver says where the wheel is:** asked when the receiver connects and when its headset comes on. At start, apps a previous run left turned down (a crash, or an update that ended it) are put back first.
-- **Session end:** shut down, restart and sign-out run the exit steps like Exit (`Classes/SessionEnd.cs`).
+- **Session end:** shut down, restart and sign-out run the exit steps like Exit (the kit's `HostWindow`).
 - **Sonar:** while `SteelSeriesSonar` runs, apps play to Sonar's virtual devices, not the headset, so ChatMixr can't mix the headset. With a wheel headset connected, the popup, Devices page, tooltip and an amber tray dot say so.
 - **Limits:** a chat in a browser tab is mixed with the rest of that browser (apps are told apart by program), unless the chat service can send its output to the chat device.
 

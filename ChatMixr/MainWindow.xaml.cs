@@ -42,7 +42,6 @@ public sealed partial class MainWindow : Window
     private readonly MixFlyout _flyout;
     private static OsdWindow? _osd;
     private static MixShortcuts? _shortcuts;
-    private readonly SessionEnd _sessionEnd;
     private readonly global::Windows.UI.ViewManagement.UISettings _uiSettings = new();
 
     /// <summary>
@@ -86,6 +85,8 @@ public sealed partial class MainWindow : Window
             SettingsManager.Current.CallsDevice);
         _flyout = new MixFlyout(Engine);
         _osd = new OsdWindow();
+        // Never activated, so WinUI's shutdown would wait for it; the host closes it before exiting.
+        HostWindow.CloseOnExit(_osd);
         Engine.WheelTurned += ShowMix;
         Engine.AutoSwitched += ShowSwitch;
         SettingsManager.WasReset += () =>
@@ -135,21 +136,16 @@ public sealed partial class MainWindow : Window
         _uiSettings.ColorValuesChanged += (_, _) => DispatcherQueue.TryEnqueue(UpdateTrayIcon);
         UpdateTrayIcon();
 
-        // Exit steps run in this order when the user picks Exit (HostWindow.Exit). The engine puts the
-        // apps' own volumes back before the tray icon goes.
+        // Exit steps run in this order on Exit, and when Windows shuts down, restarts or signs out (the
+        // kit's HostWindow handles both). The engine puts the apps' own volumes back before the tray icon goes.
         _shortcuts = new MixShortcuts(_host.Hwnd);
         _shortcuts.Pressed += DeviceActions.StepInUse;
         ApplyShortcuts();
-
-        // Shut down, restart and sign-out run the same exit steps (the kit's host only runs them for Exit).
-        _sessionEnd = new SessionEnd(_host.Hwnd);
-        _sessionEnd.Ending += ExitApp;
 
         _host.AddExitStep("save settings", SettingsManager.Save);
         _host.AddExitStep("release the shortcuts", _shortcuts.Dispose);
         _host.AddExitStep("put app volumes back", Engine.Dispose);
         _host.AddExitStep("remove the tray icon", _tray.Dispose);
-        _host.AddExitStep("stop listening for the session's end", _sessionEnd.Dispose);
 
         if (SettingsManager.IsFirstRun && SettingsManager.Current.Startup)
         {
