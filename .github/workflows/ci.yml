@@ -120,9 +120,21 @@ jobs:
         env:
           PLATFORM: ${{ matrix.platform }}
         run: |
+          # EXPERIMENT (to be replaced before merge): try the runner's own Visual Studio first, then
+          # time adding the UWP tools and try again.
           $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
-          $vs = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.ComponentGroup.UWP.BuildTools -property installationPath
-          if (-not $vs) { throw "No Visual Studio installation with the UWP build tools on this runner" }
+          $vs = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+          Write-Host "VS: $vs"
+          & $vswhere -latest -products * -property catalog_productDisplayVersion
           $rid = if ($env:PLATFORM -eq "ARM64") { "win-arm64" } else { "win-x64" }
-          & (Join-Path $vs "MSBuild\Current\Bin\amd64\MSBuild.exe") ChatMixr.GameBar/ChatMixr.GameBar.csproj -restore -p:Configuration=Debug "-p:Platform=$env:PLATFORM" "-p:RuntimeIdentifier=$rid" -v:minimal -nologo
-          if ($LASTEXITCODE -ne 0) { throw "Widget compile failed ($env:PLATFORM)" }
+          $msbuild = Join-Path $vs "MSBuild\Current\Bin\amd64\MSBuild.exe"
+          & $msbuild ChatMixr.GameBar/ChatMixr.GameBar.csproj -restore -p:Configuration=Debug "-p:Platform=$env:PLATFORM" "-p:RuntimeIdentifier=$rid" -v:minimal -nologo
+          if ($LASTEXITCODE -eq 0) { Write-Host "::notice::Widget compiled with the runner's Visual Studio as is"; exit 0 }
+          Write-Host "::warning::Compile failed as is; adding Microsoft.VisualStudio.ComponentGroup.UWP.Support"
+          $t0 = Get-Date
+          $installer = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\setup.exe"
+          $p = Start-Process $installer -ArgumentList @('modify', '--installPath', "`"$vs`"", '--add', 'Microsoft.VisualStudio.ComponentGroup.UWP.Support', '--quiet', '--norestart', '--nocache') -Wait -PassThru
+          Write-Host ("::notice::Installer exit {0} after {1:N0} s" -f $p.ExitCode, ((Get-Date) - $t0).TotalSeconds)
+          & $msbuild ChatMixr.GameBar/ChatMixr.GameBar.csproj -restore -p:Configuration=Debug "-p:Platform=$env:PLATFORM" "-p:RuntimeIdentifier=$rid" -v:minimal -nologo
+          if ($LASTEXITCODE -ne 0) { throw "Widget compile failed ($env:PLATFORM) even with UWP.Support" }
+          Write-Host "::notice::Widget compiled after adding UWP.Support"
