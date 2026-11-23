@@ -32,6 +32,7 @@ For anyone whose voice chat and game sound fight over the same headphones. Windo
 - **Game voice chat too:** voice chat built into a game plays from the game itself, so it can't be told apart by app. Install the free VB-Cable (ChatMixr walks you through it) and turn on "Mix in-game voice chat separately": voice chat gets its own channel, even in games.
 - **Switch devices the way you use them:** Switch to brings your calls and headset microphone along when they were with the device you leave, and its menu moves just games, calls or the microphone. Turn a headset on or off and ChatMixr can switch for you, with a popup saying where sound went.
 - **Shortcuts and a popup:** optional keyboard shortcuts move the mix from any app, and a popup like Windows' volume popup shows the mix when a shortcut or wheel moves it.
+- **In Xbox Game Bar:** press Win+G for a widget that moves the mix, switches devices and turns in-game voice chat on or off without leaving your game.
 - **Hear it work:** Test plays a game sound and a chat sound together until you stop it, so you can move the slider or wheel and hear the balance change.
 - **Your volumes stay yours:** ChatMixr scales each app's own volume, the same sliders as Windows' volume mixer. Changes you make there are kept, and every app goes back to its own volume when ChatMixr exits or Windows shuts down.
 - **Fits in:** follows Windows' light or dark theme and language, and can start when you sign in.
