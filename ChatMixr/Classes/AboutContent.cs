@@ -9,7 +9,7 @@ namespace ChatMixr.Classes;
 /// </summary>
 internal static class AboutContent
 {
-    /// <summary>The repository's intended owner (BRAND-4). The repository is not created yet.</summary>
+    /// <summary>The repository's owner (BRAND-4).</summary>
     public const string RepoOwner = "Dynamic-Solutions-Canada";
 
     /// <summary>The repository name.</summary>
@@ -22,8 +22,8 @@ internal static class AboutContent
     public const string NoticesPath = "ChatMixr/THIRD-PARTY-NOTICES.txt";
 
     /// <summary>
-    /// The product's privacy policy address, following the family's pattern (DOCS-8). The page does
-    /// not exist yet; it must be live, and registered (BRAND-10), before the first release.
+    /// The product's privacy policy address, following the family's pattern (DOCS-8), registered in
+    /// the standards' registry (BRAND-10).
     /// </summary>
     public static readonly Uri PrivacyPolicy = new("https://www.dynamic-solutions.ca/privacy/chatmixr");
 

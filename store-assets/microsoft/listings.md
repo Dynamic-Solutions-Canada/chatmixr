@@ -1,6 +1,6 @@
 # Microsoft Store listing text
 
-`listings.json` is the listing text in the shared `schemaVersion: 1` / `locales` shape (LIST-3), for the app's nine locale identities: `en-US`, `en-CA`, `es-ES`, `fr-FR`, `fr-CA`, `de-DE`, `zh-CN`, `pt-BR` and `ja-JP` (the same set the package manifest declares). Seven records hold wording; `en-CA` is `{ "copyFrom": "en-US" }` and `fr-CA` is `{ "copyFrom": "fr-FR" }`, matching the app's own catalogs. Fields are semantic names, not Partner Center CSV field IDs. No publisher reads this file yet (there is no repository or Store workflow), so the first submission is entered by hand from it (LIST-9).
+`listings.json` is the listing text in the shared `schemaVersion: 1` / `locales` shape (LIST-3), for the app's nine locale identities: `en-US`, `en-CA`, `es-ES`, `fr-FR`, `fr-CA`, `de-DE`, `zh-CN`, `pt-BR` and `ja-JP` (the same set the package manifest declares). Seven records hold wording; `en-CA` is `{ "copyFrom": "en-US" }` and `fr-CA` is `{ "copyFrom": "fr-FR" }`, matching the app's own catalogs. Fields are semantic names, not Partner Center CSV field IDs. Until the Store workflow reads it, a submission is entered by hand from it (LIST-9).
 
 Release notes are not in this file. Each version's "What's new" text is `release-notes/<version>.md` (`en-US`) plus one `release-notes/<version>.<identity>.md` per other wording catalog (REL-6, LIST-10).
 
@@ -49,7 +49,6 @@ Translated wording uses the same terms as the in-app catalogs (`ChatMixr/Localiz
 
 Five, in caption order: the tray popup, the mix popup above the taskbar, the Devices page, the Chat apps page and the Settings page, all in dark mode, captured from the real installed app on the test VM with a lent receiver and emulated devices; `store-assets/README.md` lists the capture steps, and `store-assets/manifest.json` holds the files, order and alt text (LIST-8). English captures serve every listing.
 
-## Open questions before submission
+## Open questions
 
 - Recapture screenshot 00 once the winui-app-kit flyout fix is pinned: until then the tray popup touches the screen edge.
-- Add the product to the shared promo catalog (apps-promo) once the listing is live.

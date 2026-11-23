@@ -6,7 +6,7 @@ ChatMixr is a resident WinUI 3 tray app that balances chat apps against everythi
 
 This repo follows the shared standards at https://github.com/Dynamic-Solutions-Canada/app-standards. Read the index for this stack, https://github.com/Dynamic-Solutions-Canada/app-standards/blob/main/stacks/windows.md, then the topic file for the area you are changing. If `external/standards/` exists, it is the same content pinned for offline use. Where this file differs from the standards, this file wins and says why.
 
-**Store: reserved, first submission by hand.** The name is reserved in Partner Center (Store ID 9N3F55DFWLQP, identity `DynamicSolutionsCA.ChatMixr`, BRAND-6), and the listing text, screenshots and release notes live in `store-assets/` and `release-notes/`, checked by `check:listing` and `check:screenshots` in `validate`. **Not yet set up:** the GitHub repository, the release and Store workflows (`build-msix.yml`, `store-publish.yml`, `credential-expiry.yml`), the `release` skill and the registry entry (BRAND-10). Until they exist, a submission is entered by hand in Partner Center from `store-assets/microsoft/listings.json`; add them following the standards' distribution and release rules (DIST-4, REL-6, LIST-9) once the repository exists. The privacy policy page lives in the website repository (`privacy/chatmixr.php`).
+**Store: live.** ChatMixr 1.0.0 is in the Microsoft Store (Store ID 9N3F55DFWLQP, identity `DynamicSolutionsCA.ChatMixr`, BRAND-6, registered in the standards' registry, BRAND-10), built from the public repository `Dynamic-Solutions-Canada/chatmixr`. The listing text, screenshots and release notes live in `store-assets/` and `release-notes/`, checked by `check:listing` and `check:screenshots` in `validate`. **Still missing:** the release and Store workflows (`build-msix.yml`, `store-publish.yml`, `credential-expiry.yml`) and the `release` skill (DIST-4, REL-6, LIST-9). Until they exist, a submission is entered by hand in Partner Center from `store-assets/microsoft/listings.json`. The privacy policy page lives in the website repository (`privacy/chatmixr.php`).
 
 ## Architecture
 
@@ -72,7 +72,7 @@ This repo follows the shared standards at https://github.com/Dynamic-Solutions-C
 - **Threads:** all Core Audio calls and the volume bookkeeping run on the engine's one audio thread. Receivers' reader threads, the timer and the interface only post work to it. The interface reads `MixEngine.Snapshot` on the UI thread and redraws on `Changed`.
 - **Portable rules stay portable:** anything in `Models/` must not touch Windows, so the Linux harness can link it unchanged.
 - **Every user-visible string goes through the catalogs.** Add the key to all seven `Localization/Catalogs/*.json` (en-CA and fr-CA reuse en-US and fr-FR); never define a `kit.` key. Program names, device names and logs are never translated. Translations are unreviewed machine translations.
-- **Package identity:** the manifest carries the dev identity `TechnicallyReal.ChatMixr` until Partner Center assigns the Store one; the kit's packaging script stamps signed dev builds with it and the dev certificate's publisher. Never invent a Store identity.
+- **Package identity:** the manifest carries the Store identity `DynamicSolutionsCA.ChatMixr`; the kit's packaging script stamps signed dev builds with the dev identity `TechnicallyReal.ChatMixr` and the dev certificate's publisher. Never change either identity.
 - **Product name:** "ChatMix" is SteelSeries' feature name. The maintainer chose "ChatMixr" knowing the trademark risk; listing text names SteelSeries and Arctis only to say what the app works with.
 
 ## Commands
@@ -84,7 +84,7 @@ Source is authoritative in WSL, with submodules initialised (`git submodule upda
 | `npm run verify:desktop` | The app compiles on Windows (Debug), XAML included | That it packages or runs |
 | `npm run package:desktop:dev` | A signed dev package builds | That it installs or runs |
 | `npm run install:desktop` | The dev package updates in place and launches | Behaviour; check it with the headsets |
-| `npm run package:desktop` | An unsigned package builds, manifest strings resolved for every language | Signing; that it runs; it carries the dev identity until the name is reserved |
+| `npm run package:desktop` | An unsigned package builds, manifest strings resolved for every language | Signing; that it runs |
 | `npm run check:l10n` | The kit's catalog check: keys, placeholders, no em dashes, manifest languages, no app `kit.` keys | That the text is translated well |
 | `npm test` | Every harness under `tests/` passes on Linux: the mixing rules and the settings file | Anything needing Windows or the headsets (see each README) |
 | `npm run check:notices` | The notices file matches the restored packages, and About links to its real path | That licences were read right |
@@ -116,5 +116,4 @@ Before finishing a change, run `npm run validate` and `npm run verify:desktop`; 
 | winui-app-kit pin bumped | The kit's `.editorconfig` and `build/shared.gitignore` (the last part of `.gitignore`) at that tag, then `npm run format` |
 | A language or catalog rule | Conventions above, the `localization` block in `windows-build.json` |
 | A NuGet package added, removed or updated | `npm run generate:notices`, and commit the notices file |
-| The name is reserved in Partner Center | The manifest identity, `store_identity` and `store_publisher` in `windows-build.json`, the Store listing and its checks in `validate`, the release and Store workflows, the `release` skill, and the "Not yet set up" note above |
 | A guide or skill moved or removed | The guidance map above and every skill that names it |

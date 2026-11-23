@@ -24,7 +24,7 @@
 
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.26100.0" />
-    <!-- Keep in step with Microsoft.WindowsAppSDK in ChatMixr.csproj (1.8 line). -->
+    <!-- Keep in step with the Microsoft.WindowsAppSDK version winui-app-kit pins (build/WinUIAppKit.Packages.props at the kit tag); its release notes give the runtime MinVersion. -->
     <PackageDependency Name="Microsoft.WindowsAppRuntime.2" MinVersion="2.6.5.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
   </Dependencies>
 

@@ -21,13 +21,13 @@ Run these from the repository root in WSL:
 | `npm run install:desktop` | Builds the dev MSIX, updates the installed copy in place and launches it | That it installs and starts; check behaviour in the app |
 | `npm run package:desktop` | Unsigned Store MSIX | The Store package builds, with manifest text resolved for every language |
 
-Signed dev builds (`package:desktop:dev`, `install:desktop`) install under the dev identity `TechnicallyReal.ChatMixr`. The app has no Store identity yet, so `npm run package:desktop` also carries the dev identity, and `--store-identity` is not available until the name is reserved in Partner Center. Never uninstall to get past an update error.
+Signed dev builds (`package:desktop:dev`, `install:desktop`) install under the dev identity `TechnicallyReal.ChatMixr`. `npm run package:desktop` builds the unsigned package under the Store identity `DynamicSolutionsCA.ChatMixr`, and `--store-identity` signs a test package under it. Never uninstall to get past an update error.
 
 Packaging runs winui-app-kit's `build/build-msix.ps1`, configured by `windows-build.json` (the manifest folder, the dev and Store identities, and `manifest_strings`, which writes the manifest's translated text from the catalogs). `<Version>` in `Directory.Build.props` is the only version source. Dev builds raise the revision only in the staged copy, so the tracked version changes only for a release.
 
 ## Checks
 
-`npm run validate` is the Linux gate. It leaves out the Store listing and screenshot checks until the app has a listing (see AGENTS.md). It runs, in order:
+`npm run validate` is the Linux gate. It runs, in order:
 
 - `npm run format:check`: every C# project outside `external/` matches the root `.editorconfig`, which is winui-app-kit's file copied unchanged from the tag the app pins; never hand-edit it. `npm run format` rewrites the files.
 - `npm run check:gitignore`: `.gitignore` ends with winui-app-kit's shared block, unchanged.
@@ -70,13 +70,13 @@ The harnesses cannot see the screen, the receivers or Windows' mixer. Before a r
 - Unplug a receiver or a device: it leaves the list, and the app does not crash or spin.
 - Settings: start at sign-in, theme, and a language change that relabels the flyout, the window and the tray tooltip without reopening them. Reset settings asks first, then puts theme, language, the chat app list, every slider and the device order back to their defaults without changing Start with Windows.
 - A second launch opens the window of the copy already running instead of starting another.
-- About: the identity card with the icon and version, Check for updates, each link (the privacy policy page and the repository must be live before the first release), and "Open logs folder".
+- About: the identity card with the icon and version, Check for updates, each link, and "Open logs folder".
 - A settings file that can't be read (replace `settings.json` with text that isn't JSON, then start the app): the window opens on Settings with the "settings were reset" notice naming the `.bad` backup.
 - Light, dark and high contrast.
 
 ## Releases
 
-Not set up yet. The name is not reserved in Partner Center, so there is no Store identity, listing, release notes or release workflow. When it is reserved, add what the standards require for a Store app (DIST-4, REL-6, LIST-5): the `release` skill, `build-msix.yml`, `store-publish.yml` and `credential-expiry.yml`, the Store listing in `store-assets/microsoft/`, and `check:listing` and `check:screenshots` back in `validate`.
+Not automated yet: a release is submitted by hand in Partner Center from `store-assets/microsoft/listings.json`. The release and Store workflows and the `release` skill replace this section when they land.
 
 ## Where the app stores data
 
