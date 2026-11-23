@@ -35,6 +35,7 @@ internal sealed class DeviceRow
         LargeChange = SliderMix.KeyStep,
         TickFrequency = SliderMix.Max,
         TickPlacement = TickPlacement.Outside,
+        ThumbToolTipValueConverter = new LevelsBubble(),   // the levels while dragging, not -100 to 100
         Margin = new Thickness(8, 0, 8, 0),
     };
 

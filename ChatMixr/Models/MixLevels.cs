@@ -87,6 +87,21 @@ public static class SliderMix
         return new MixLevels(game, chat);
     }
 
+    /// <summary>The catalog text that says the two levels, with <c>{{game}}</c> and <c>{{chat}}</c> in it.</summary>
+    public const string LevelsKey = "slider.levels";
+
+    /// <summary>
+    /// What the bubble over a dragged slider says, in the popup and the Game Bar widget alike: the two
+    /// levels the drag gives (detent applied), not the slider's raw -100 to 100.
+    /// </summary>
+    /// <param name="value">The slider's raw value.</param>
+    /// <param name="format">Fills a catalog key's placeholders in the current language (each UI's own text lookup).</param>
+    public static string LevelsText(double value, Func<string, (string Name, object? Value)[], string> format)
+    {
+        MixLevels levels = LevelsAt(Snap((int)Math.Round(value)));
+        return format(LevelsKey, [("game", levels.Game), ("chat", levels.Chat)]);
+    }
+
     /// <summary>The slider position that shows a wheel's levels; the inverse of <see cref="LevelsAt"/>.</summary>
     public static int PositionOf(MixLevels levels)
     {

@@ -5,9 +5,10 @@ using WinUIAppKit.Localization;
 namespace ChatMixr.GameBar;
 
 /// <summary>
-/// The few words the widget shows on its own, while ChatMixr isn't connected (everything else comes
-/// from ChatMixr in its own language). Read from ChatMixr's catalogs through the kit's dependency-free
-/// <see cref="TextLookup"/>, in the language ChatMixr last said it uses, else Windows'.
+/// The few words the widget shows on its own: while ChatMixr isn't connected, and the slider's
+/// drag bubble (everything else comes from ChatMixr in its own language). Read from ChatMixr's
+/// catalogs through the kit's dependency-free <see cref="TextLookup"/>, in the language ChatMixr
+/// last said it uses, else Windows'.
 /// </summary>
 internal static class WidgetText
 {
@@ -23,6 +24,9 @@ internal static class WidgetText
 
     /// <summary>The text for a catalog key.</summary>
     public static string Get(string key) => Lookup.Get(key);
+
+    /// <summary>The text for a catalog key with its placeholders filled.</summary>
+    public static string Format(string key, params (string Name, object? Value)[] values) => Lookup.Format(key, values);
 
     /// <summary>
     /// Follow ChatMixr's language. Returns true when it changed, so the page redraws its own words.

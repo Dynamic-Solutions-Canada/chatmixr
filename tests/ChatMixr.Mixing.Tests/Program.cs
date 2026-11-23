@@ -128,6 +128,11 @@ void SliderLevels()
     Check(SliderMix.LevelsAt(100) == new MixLevels(0, 100), "all the way toward chat silences the game side");
     Check(SliderMix.LevelsAt(-40) == new MixLevels(100, 60), "toward game lowers chat only");
     Check(SliderMix.LevelsAt(500) == new MixLevels(0, 100), "out-of-range positions are clamped");
+
+    static string Fill(string key, (string Name, object? Value)[] values) =>
+        key + ":" + string.Join(",", values.Select(v => $"{v.Name}={v.Value}"));
+    Check(SliderMix.LevelsText(-40.4, Fill) == "slider.levels:game=100,chat=60", "the drag bubble says the levels, not the raw position");
+    Check(SliderMix.LevelsText(3, Fill) == "slider.levels:game=100,chat=100", "the drag bubble shows the detent's levels");
 }
 
 void SliderDetent()

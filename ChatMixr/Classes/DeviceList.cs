@@ -82,7 +82,7 @@ internal static class DeviceList
             LargeChange = SliderMix.Max / 2,
             TickFrequency = SliderMix.Max,
             TickPlacement = TickPlacement.Outside,
-            IsThumbToolTipEnabled = false,
+            ThumbToolTipValueConverter = new LevelsBubble(),   // the levels while dragging, as in the Game Bar widget
             VerticalAlignment = VerticalAlignment.Center,
         };
         private readonly TextBlock _gameLabel = new() { VerticalAlignment = VerticalAlignment.Center };
@@ -194,11 +194,12 @@ internal static class DeviceList
             // its tooltip and screen readers say why it doesn't move), but any change snaps back.
             _slider.Opacity = off || (device.HasWheel && device.Levels == null) ? 0.5 : 1;
             ToolTipService.SetToolTip(_slider, device.HasWheel ? UiText.Get("slider.wheel-tip") : null);
+            _slider.IsThumbToolTipEnabled = !device.HasWheel;   // a wheel's slider snaps back, so no drag bubble
             AutomationProperties.SetName(_slider, UiText.Format("slider.name", ("device", device.Name)));
 
             // Screen readers hear the two levels, not the slider's raw -100 to 100.
             var shown = device.Levels ?? new MixLevels(100, 100);
-            AutomationProperties.SetHelpText(_slider, UiText.Format(device.HasWheel ? "slider.levels-wheel" : "slider.levels",
+            AutomationProperties.SetHelpText(_slider, UiText.Format(device.HasWheel ? "slider.levels-wheel" : SliderMix.LevelsKey,
                 ("game", shown.Game), ("chat", shown.Chat)));
 
             int position = device.Levels is MixLevels levels ? SliderMix.PositionOf(levels) : 0;
