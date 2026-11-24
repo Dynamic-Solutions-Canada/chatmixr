@@ -1,6 +1,6 @@
 # Microsoft Store listing text
 
-`listings.json` is the listing text in the shared `schemaVersion: 1` / `locales` shape (LIST-3), for the app's nine locale identities: `en-US`, `en-CA`, `es-ES`, `fr-FR`, `fr-CA`, `de-DE`, `zh-CN`, `pt-BR` and `ja-JP` (the same set the package manifest declares). Seven records hold wording; `en-CA` is `{ "copyFrom": "en-US" }` and `fr-CA` is `{ "copyFrom": "fr-FR" }`, matching the app's own catalogs. Fields are semantic names, not Partner Center CSV field IDs. No publisher reads this file: the Store workflow uploads packages and release notes only, so listing changes are entered by hand in Partner Center from it (LIST-9).
+`listings.json` is the listing text in the shared `schemaVersion: 1` / `locales` shape (LIST-3), for the app's nine locale identities: `en-US`, `en-CA`, `es-ES`, `fr-FR`, `fr-CA`, `de-DE`, `zh-CN`, `pt-BR` and `ja-JP` (the same set the package manifest declares). Seven records hold wording; `en-CA` is `{ "copyFrom": "en-US" }` and `fr-CA` is `{ "copyFrom": "fr-FR" }`, matching the app's own catalogs. Fields are semantic names, not Partner Center CSV field IDs. The Store workflow uploads packages, release notes, and the screenshots with each locale's captions from this file; the rest of the listing text is entered by hand in Partner Center from it (LIST-9).
 
 Release notes are not in this file. Each version's "What's new" text is `release-notes/<version>.md` (`en-US`) plus one `release-notes/<version>.<identity>.md` per other wording catalog (REL-6, LIST-10).
 
@@ -19,16 +19,17 @@ Translated wording uses the same terms as the in-app catalogs (`ChatMixr/Localiz
 | Screenshot captions | One per screenshot, up to 200 characters |
 | Release notes (`release-notes/`) | 1,500 characters |
 
-`check:listing` enforces these; the en-US draft is 3,144 characters of description and 12 features.
+`check:listing` enforces these. The longest record is fr-FR, at 3,964 characters of description, close to the limit; check it first when the description grows.
 
 ## Claims to keep true
 
 - Wheels: read without SteelSeries GG from Arctis Nova 7 family receivers, tested on the Nova 7X and Nova 7X Gen 2 only. Don't name other models as tested.
 - Sonar must be off to mix an Arctis headset, and the app says when it is on.
+- Switch to: a headset's own microphone comes along, including after speakers or a TV; a separate microphone stays put; calls follow only when they were on the device being left. This is automatic, not a setting.
 - Apps are told apart by program, so a chat in a browser tab is mixed with the rest of that browser.
-- In-game voice chat needs VB-Cable, which the user installs; ChatMixr never downloads or installs it (its licence forbids bundling).
+- In-game voice chat needs VB-Cable, which the user installs; ChatMixr never downloads or installs it (its license forbids bundling).
 - Volumes: ChatMixr scales each app's own volume and puts it back on exit and Windows shutdown. A crash can leave apps turned down until ChatMixr next starts.
-- Privacy: no account, ads, analytics or telemetry. Settings and logs are local. The only network request is the "Our other apps" catalogue, when that page opens; "Check for updates" opens the Store's updates page.
+- Privacy: no account, ads, analytics or telemetry. Settings and logs are local. The only network request is the "Our other apps" catalog, when that page opens; "Check for updates" opens the Store's updates page.
 - Not made by or affiliated with SteelSeries. "ChatMix", SteelSeries and Arctis are named only to say what the app works with.
 - The interface is in English, Spanish, French, German, Simplified Chinese, Brazilian Portuguese and Japanese, following Windows or a choice in Settings.
 - Requires Windows 10 (22H2) or Windows 11 (the manifest's minimum version, 10.0.19045.5011).

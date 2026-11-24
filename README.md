@@ -26,12 +26,12 @@ For anyone whose voice chat and game sound fight over the same headphones. Windo
 
 ## Features
 
-- **A slider for every device:** the tray popup lists your headsets and speakers, each with its own remembered balance, plus the volume of the one in use and an order you choose by dragging.
-- **Arctis ChatMix wheels, without GG:** each connected Arctis Nova 7 receiver's wheel controls its own headset, so a desk headset and a TV headset both work at once. Battery and power show on each headset's card.
+- **A slider for every device:** the tray popup lists your headsets, speakers and TVs, each with its own remembered balance, plus the volume of the one in use and an order you choose by dragging.
+- **Arctis ChatMix wheels, without GG:** each connected Arctis Nova 7 receiver's wheel controls its own headset, so a desk headset and a couch headset both work at once. Battery and power show on each headset's card.
 - **Chat against everything else:** Discord, Teams, Zoom, Slack, TeamSpeak, Mumble and other common chat apps are listed to start with, and you can add or remove any program.
-- **Game voice chat too:** voice chat built into a game plays from the game itself, so it can't be told apart by app. Install the free VB-Cable (ChatMixr walks you through it) and turn on "Mix in-game voice chat separately": voice chat gets its own channel, even in games.
-- **Switch devices the way you use them:** Switch to brings your calls along when they were with the device you leave, and your headset microphone to the next headset even after a stop on speakers or a TV (a separate microphone stays put), and its menu moves just games, calls or the microphone. Turn a headset on or off and ChatMixr can switch for you, with a popup saying where sound went.
-- **Shortcuts and a popup:** optional keyboard shortcuts move the mix from any app, and a popup like Windows' volume popup shows the mix when a shortcut or wheel moves it.
+- **In-game voice chat:** voice chat built into a game can have its own channel too. ChatMixr walks you through installing the free VB-Cable, then mixes it separately from the game's sound.
+- **Switch devices the way you use them:** Switch to a headset and its microphone comes along, even after speakers or a TV; a separate microphone stays put. Calls follow when they were on the device you leave. Turn a headset on or off and ChatMixr can switch for you.
+- **Shortcuts and a popup:** optional keyboard shortcuts move the mix from any app, and a popup like Windows' volume popup shows the balance when a shortcut or wheel moves it.
 - **In Xbox Game Bar:** press Win+G for a widget that moves the mix, switches devices and turns in-game voice chat on or off without leaving your game.
 - **Hear it work:** Test plays a game sound and a chat sound together until you stop it, so you can move the slider or wheel and hear the balance change.
 - **Your volumes stay yours:** ChatMixr scales each app's own volume, the same sliders as Windows' volume mixer. Changes you make there are kept, and every app goes back to its own volume when ChatMixr exits or Windows shuts down.
@@ -45,19 +45,19 @@ ChatMixr collects no telemetry or crash reports.
 
 ### Requirements
 
-- Windows 10 (22H2) or Windows 11.
-- Any playback device for the sliders. For a wheel: a SteelSeries Arctis Nova 7 family headset and receiver. Tested with the Nova 7X and Nova 7X Gen 2; other Nova 7 models use the same wheel report and should work, but are untested.
-- For game voice chat: [VB-Cable](https://vb-audio.com/Cable/), free from VB-Audio, installed by you.
+- Windows 10 (22H2) or Windows 11, on x64 or ARM64.
+- Any playback device for the sliders. For a wheel: a SteelSeries Arctis Nova 7 family headset and its receiver (tested on the Nova 7X and Nova 7X Gen 2).
+- For in-game voice chat: [VB-Cable](https://vb-audio.com/Cable/), free from VB-Audio.
 
-## Good to know
+## How it works
 
-- On Windows 10, ChatMixr's tray icon may start among the hidden icons (the arrow next to the clock). Drag it onto the taskbar to keep it in view.
-- With an Arctis headset, Sonar must be off (in SteelSeries GG, or exit GG), because it sends your apps' sound to its own devices instead of the headset.
-- Apps are told apart by program, so a chat in a browser tab is mixed with everything else that browser plays, unless the chat service can send its sound to the virtual cable. Use the chat service's desktop app otherwise.
+- ChatMixr mixes by app. For chat in a browser tab, use the service's desktop app.
+- With an Arctis headset, turn Sonar off in SteelSeries GG (or exit GG). ChatMixr tells you if it is on.
+- On Windows 10, the tray icon may start among the hidden icons (the arrow next to the clock). Drag it onto the taskbar to keep it in view.
 
 ## Languages
 
-English (United States and Canada), Spanish, French (France and Canada), German, Simplified Chinese, Brazilian Portuguese and Japanese.
+ChatMixr is available in English (United States and Canada), Spanish, French (France and Canada), German, Simplified Chinese, Brazilian Portuguese and Japanese. It follows Windows' language unless you pick one in Settings.
 
 ## Developers
 
@@ -68,4 +68,4 @@ English (United States and Canada), Spanish, French (France and Canada), German,
 
 ## License
 
-Copyright (c) 2026 Dynamic Solutions. Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). ChatMixr is not made by or affiliated with SteelSeries.
+Copyright (c) 2026 Dynamic Solutions. Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE), free for personal and other noncommercial use. ChatMixr is not made by or affiliated with SteelSeries.
