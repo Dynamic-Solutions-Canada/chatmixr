@@ -65,7 +65,7 @@
   "device.switch-name": "Zu {{device}} wechseln",
   "device.switch-off-tip": "Schalten Sie das Headset ein, um zu ihm zu wechseln",
   "device.switch-output": "Nur Spiele und Medien",
-  "device.switch-tip": "Ton über dieses Gerät ausgeben. Anrufe und Mikrofon wechseln mit, wenn sie beim verwendeten Gerät waren.",
+  "device.switch-tip": "Ton über dieses Gerät ausgeben. Anrufe wechseln mit, wenn sie beim verwendeten Gerät waren, und sein Mikrofon wechselt mit, außer Sie nutzen ein separates.",
   "device.test": "Testen",
   "device.test-name": "{{device}} testen",
   "device.test-stop": "Stopp",

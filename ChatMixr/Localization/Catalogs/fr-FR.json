@@ -65,7 +65,7 @@
   "device.switch-name": "Passer à {{device}}",
   "device.switch-off-tip": "Allumez le casque pour passer à lui",
   "device.switch-output": "Jeux et médias seulement",
-  "device.switch-tip": "Faire jouer le son sur ce périphérique. Les appels et le micro suivent s'ils étaient sur le périphérique utilisé.",
+  "device.switch-tip": "Faire jouer le son sur ce périphérique. Les appels suivent s'ils étaient sur le périphérique utilisé, et son micro aussi, sauf si vous utilisez un micro à part.",
   "device.test": "Tester",
   "device.test-name": "Tester {{device}}",
   "device.test-stop": "Arrêter",

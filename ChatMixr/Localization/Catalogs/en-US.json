@@ -65,7 +65,7 @@
   "device.switch-name": "Switch to {{device}}",
   "device.switch-off-tip": "Turn the headset on to switch to it",
   "device.switch-output": "Games and media only",
-  "device.switch-tip": "Play sound through this device. Calls and the microphone come along if they were on the device in use.",
+  "device.switch-tip": "Play sound through this device. Calls come along if they were on the device in use, and its microphone comes along unless you use a separate one.",
   "device.test": "Test",
   "device.test-name": "Test {{device}}",
   "device.test-stop": "Stop",

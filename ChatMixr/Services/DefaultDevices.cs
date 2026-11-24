@@ -91,11 +91,13 @@ internal sealed class DefaultDevices
     /// <param name="deviceId">The playback device.</param>
     /// <param name="scope">What to move there.</param>
     /// <param name="microphoneOf">A playback device's own microphone, or null.</param>
+    /// <param name="headsetOfMicrophone">The separate headset whose own microphone a recording device is, or null.</param>
     /// <param name="cableId">The cable while it holds Windows' communications default for in-game voice
     /// chat (calls then change only here, and reach Windows when voice chat is turned off); null otherwise.</param>
-    public void Switch(string deviceId, SwitchScope scope, Func<string, string?> microphoneOf, string? cableId)
+    public void Switch(string deviceId, SwitchScope scope, Func<string, string?> microphoneOf, Func<string, string?> headsetOfMicrophone, string? cableId)
     {
-        var plan = DefaultRoles.Plan(scope, deviceId, microphoneOf(deviceId), new Defaults(Output, Calls, Microphone), microphoneOf);
+        var now = new Defaults(Output, Calls, Microphone);
+        var plan = DefaultRoles.Plan(scope, deviceId, microphoneOf(deviceId), now, microphoneOf, headsetOfMicrophone);
         if (plan.Output != null && AudioPolicy.SetOutput(plan.Output))
         {
             Logger.Info("Games and media now play on {Device} ({Scope})", plan.Output, scope);

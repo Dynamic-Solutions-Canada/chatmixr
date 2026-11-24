@@ -65,7 +65,7 @@
   "device.switch-name": "切换到 {{device}}",
   "device.switch-off-tip": "打开耳机后才能切换到它",
   "device.switch-output": "仅游戏和媒体",
-  "device.switch-tip": "通过此设备播放声音。通话和麦克风原本在正在使用的设备上时会一起切换。",
+  "device.switch-tip": "通过此设备播放声音。通话原本在正在使用的设备上时会一起切换；除非你使用单独的麦克风，否则也会切换到此设备的麦克风。",
   "device.test": "测试",
   "device.test-name": "测试 {{device}}",
   "device.test-stop": "停止",

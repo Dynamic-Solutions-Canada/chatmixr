@@ -65,7 +65,7 @@
   "device.switch-name": "Mudar para {{device}}",
   "device.switch-off-tip": "Ligue o headset para mudar para ele",
   "device.switch-output": "Só jogos e mídia",
-  "device.switch-tip": "Tocar o som neste dispositivo. Chamadas e o microfone vão junto se estavam no dispositivo em uso.",
+  "device.switch-tip": "Tocar o som neste dispositivo. Chamadas vão junto se estavam no dispositivo em uso, e o microfone dele também, a menos que você use um separado.",
   "device.test": "Testar",
   "device.test-name": "Testar {{device}}",
   "device.test-stop": "Parar",

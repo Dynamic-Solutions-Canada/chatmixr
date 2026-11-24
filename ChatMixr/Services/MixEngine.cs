@@ -384,7 +384,7 @@ public sealed class MixEngine : IDisposable
     private void Switch(string deviceId, SwitchScope scope)
     {
         Logger.Info("Switching to {Device} ({Scope})", _devices.TryGetValue(deviceId, out var d) ? d.Info.Name : deviceId, scope);
-        _defaults.Switch(deviceId, scope, MicrophoneOf, CableHoldsCalls ? _cable!.Id : null);
+        _defaults.Switch(deviceId, scope, MicrophoneOf, HeadsetOfMicrophone, CableHoldsCalls ? _cable!.Id : null);
         Publish();
     }
 
@@ -394,10 +394,8 @@ public sealed class MixEngine : IDisposable
     /// <summary>Log which devices count as having their own microphone (what Switch to may move), when that changes.</summary>
     private void LogMicrophonePairs()
     {
-        string pairs = string.Join("; ", _devices.Values
-            .Select(d => (d.Info.Name, Microphone: MicrophoneOf(d.Info.Id)))
-            .Where(p => p.Microphone != null)
-            .Select(p => $"{p.Name} -> {_recording.First(r => r.Id == p.Microphone).Name}"));
+        string pairs = string.Join("; ", MicrophonePairs()
+            .Select(p => $"{_devices[p.Device].Info.Name} -> {_recording.First(r => r.Id == p.Microphone).Name}"));
         if (pairs != _loggedMicrophonePairs)
         {
             _loggedMicrophonePairs = pairs;
@@ -408,6 +406,21 @@ public sealed class MixEngine : IDisposable
     /// <summary>A listed playback device's own microphone, or null.</summary>
     private string? MicrophoneOf(string deviceId) =>
         _devices.TryGetValue(deviceId, out var device) ? DefaultDevices.MicrophoneOf(device.Info, _recording) : null;
+
+    /// <summary>Every listed playback device that has its own microphone, with their container.</summary>
+    private IEnumerable<DeviceMicrophone> MicrophonePairs()
+    {
+        foreach (var device in _devices.Values)
+        {
+            if (DefaultDevices.MicrophoneOf(device.Info, _recording) is { } microphone)
+            {
+                yield return new DeviceMicrophone(device.Info.Id, microphone, device.Info.ContainerId);
+            }
+        }
+    }
+
+    /// <summary>The separate headset whose own microphone a recording device is, or null (<see cref="DefaultRoles.SeparateHeadsetOf"/>).</summary>
+    private string? HeadsetOfMicrophone(string recordingId) => DefaultRoles.SeparateHeadsetOf(recordingId, MicrophonePairs());
 
     /// <summary>True while in-game voice chat has Windows' communications default on the cable.</summary>
     private bool CableHoldsCalls => _separateChat && _cable != null && _cableListenSide != null;

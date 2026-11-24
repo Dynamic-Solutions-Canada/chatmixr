@@ -48,7 +48,7 @@ How it all works is in [ARCHITECTURE.md](ARCHITECTURE.md); the receivers' report
 - **No guessing the wheel:** a wheel device isn't scaled until its receiver reports where the wheel is. Receivers are opened shared, so SteelSeries GG can read them too.
 - **One headset link:** a receiver and its playback endpoints are matched only by Windows container id (the receivers have no serial number).
 - **Virtual devices stay hidden:** software devices are never listed or mixed, judged by the audio adapter's enumerator, not the container.
-- **Defaults move together, or not at all:** Switch to brings calls and the microphone along only when they were with the device being replaced (`Models/DefaultRoles.cs`).
+- **Defaults move together, or not at all:** Switch to brings calls along only when they were with the device being replaced, and a headset's microphone when it was the replaced device's or was left behind on a headset no longer in use; a desk microphone stays put (`Models/DefaultRoles.cs`).
 - **Voice chat is never stranded:** whenever in-game voice chat turns off, or ChatMixr exits, the communications default goes back to the user's calls device.
 - **VB-Cable is never downloaded or run by ChatMixr** (its licence forbids bundling).
 - **Untested receivers stay untested:** only the Nova 7X and Nova 7X Gen 2 are measured; never call another model tested.
