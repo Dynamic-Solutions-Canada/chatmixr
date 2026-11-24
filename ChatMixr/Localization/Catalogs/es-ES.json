@@ -65,7 +65,7 @@
   "device.switch-name": "Cambiar a {{device}}",
   "device.switch-off-tip": "Enciende los auriculares para cambiar a ellos",
   "device.switch-output": "Solo juegos y multimedia",
-  "device.switch-tip": "Reproducir el sonido por este dispositivo. Las llamadas y el micrófono lo acompañan si estaban en el dispositivo en uso.",
+  "device.switch-tip": "Reproducir el sonido por este dispositivo. Las llamadas lo acompañan si estaban en el dispositivo en uso, y su micrófono también, salvo que uses uno aparte.",
   "device.test": "Probar",
   "device.test-name": "Probar {{device}}",
   "device.test-stop": "Detener",

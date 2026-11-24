@@ -65,7 +65,7 @@
   "device.switch-name": "{{device}} に切り替え",
   "device.switch-off-tip": "切り替えるにはヘッドセットの電源を入れてください",
   "device.switch-output": "ゲームとメディアのみ",
-  "device.switch-tip": "このデバイスから音を再生します。通話とマイクは、使用中のデバイスにあった場合に一緒に移ります。",
+  "device.switch-tip": "このデバイスから音を再生します。通話は使用中のデバイスにあった場合に一緒に移り、別のマイクを使っていなければ、このデバイスのマイクにも切り替わります。",
   "device.test": "テスト",
   "device.test-name": "{{device}} をテスト",
   "device.test-stop": "停止",

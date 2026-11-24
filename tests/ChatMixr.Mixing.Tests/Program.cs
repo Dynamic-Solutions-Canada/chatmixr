@@ -3,10 +3,18 @@
 // losing the volume the user chose for it. Exits non-zero on the first failure.
 using ChatMixr.Models;
 
-// Ids for the switch scenarios: a headset with its own mic, speakers with none, a desk microphone.
+// Ids for the switch scenarios: two headsets with their own mics, speakers and a TV with none, a desk
+// microphone, and onboard headphones whose paired mic is the PC's own mic jack.
 // Declared before the scenarios run: a top-level statement after the final return is unreachable.
-const string HeadsetA = "headset-a", HeadsetB = "headset-b", Speakers = "speakers";
+const string HeadsetA = "headset-a", HeadsetB = "headset-b", Speakers = "speakers", Tv = "tv";
 const string MicA = "mic-a", MicB = "mic-b", DeskMic = "desk-mic";
+const string OnboardHeadphones = "onboard-headphones", OnboardMic = "onboard-mic";
+DeviceMicrophone[] microphonePairs =
+[
+    new(HeadsetA, MicA, new Guid("0293aff9-e552-11f1-8095-806e6f6e6963")),
+    new(HeadsetB, MicB, new Guid("0293aff5-e552-11f1-8095-806e6f6e6963")),
+    new(OnboardHeadphones, OnboardMic, ChatDevicePairing.SoftwareContainer),
+];
 
 var scenarios = new List<(string Name, Action Body)>
 {
@@ -21,6 +29,8 @@ var scenarios = new List<(string Name, Action Body)>
     ("a key press always leaves the middle, and stops there on the way through", SliderKeys),
     ("a plain switch brings calls and the headset's mic along only when they were with the old device", SwitchFollows),
     ("a split setup stays split, and a desk microphone stays put", SwitchKeepsSplit),
+    ("a headset's mic left behind by speakers or a TV follows to the next headset", SwitchBringsLeftBehindMic),
+    ("only a separate headset's mic counts as left behind, never the PC's own mic jack", SeparateHeadsetMicrophones),
     ("the switch menu moves one default at a time, and nothing already there", SwitchSingleRoles),
     ("calls follow an output change made outside ChatMixr only when they were with it", CallsFollowOutsideChange),
     ("a device's calls and microphone roles count as a change to redraw", SnapshotSeesRoles),
@@ -149,41 +159,74 @@ void SliderKeys()
     Check(SliderMix.KeyMove(90, 140) == SliderMix.Max, "out of range is clamped");
 }
 
-string? MicOf(string device) => device switch { HeadsetA => MicA, HeadsetB => MicB, _ => null };
+string? MicOf(string device) => device switch { HeadsetA => MicA, HeadsetB => MicB, OnboardHeadphones => OnboardMic, _ => null };
+
+string? HeadsetOfMic(string microphone) => DefaultRoles.SeparateHeadsetOf(microphone, microphonePairs);
 
 void SwitchFollows()
 {
     var together = new Defaults(HeadsetA, HeadsetA, MicA);
-    var plan = DefaultRoles.Plan(SwitchScope.Follow, HeadsetB, MicB, together, MicOf);
+    var plan = DefaultRoles.Plan(SwitchScope.Follow, HeadsetB, MicB, together, MicOf, HeadsetOfMic);
     Check(plan == new SwitchPlan(HeadsetB, HeadsetB, MicB), "a headset used for everything hands everything to the next one");
 
     var fresh = new Defaults(Speakers, null, null);
-    plan = DefaultRoles.Plan(SwitchScope.Follow, HeadsetB, MicB, fresh, MicOf);
+    plan = DefaultRoles.Plan(SwitchScope.Follow, HeadsetB, MicB, fresh, MicOf, HeadsetOfMic);
     Check(plan == new SwitchPlan(HeadsetB, HeadsetB, MicB), "with no calls device or microphone yet, both come along");
 
-    plan = DefaultRoles.Plan(SwitchScope.Follow, Speakers, null, together, MicOf);
+    plan = DefaultRoles.Plan(SwitchScope.Follow, Speakers, null, together, MicOf, HeadsetOfMic);
     Check(plan == new SwitchPlan(Speakers, Speakers, null), "speakers take calls too, but have no mic to take, so the headset's stays");
 }
 
 void SwitchKeepsSplit()
 {
     var split = new Defaults(Speakers, HeadsetA, MicA);
-    var plan = DefaultRoles.Plan(SwitchScope.Follow, HeadsetB, MicB, split, MicOf);
+    var plan = DefaultRoles.Plan(SwitchScope.Follow, HeadsetB, MicB, split, MicOf, HeadsetOfMic);
     Check(plan == new SwitchPlan(HeadsetB, null, null), "speakers for games, headset for calls: only games move");
 
     var desk = new Defaults(HeadsetA, HeadsetA, DeskMic);
-    plan = DefaultRoles.Plan(SwitchScope.Follow, HeadsetB, MicB, desk, MicOf);
+    plan = DefaultRoles.Plan(SwitchScope.Follow, HeadsetB, MicB, desk, MicOf, HeadsetOfMic);
     Check(plan == new SwitchPlan(HeadsetB, HeadsetB, null), "a desk microphone isn't the old headset's, so it stays");
+}
+
+void SwitchBringsLeftBehindMic()
+{
+    // Nov 23, 11:31 a.m.: sound and calls on the soundbar, the mic still on the other headset's.
+    var plan = DefaultRoles.Plan(SwitchScope.Follow, HeadsetA, MicA, new Defaults(Speakers, Speakers, MicB), MicOf, HeadsetOfMic);
+    Check(plan == new SwitchPlan(HeadsetA, HeadsetA, MicA), "headset on after the soundbar: the other headset's mic comes along");
+
+    // Nov 23: headset A turns off (to the soundbar), sound moves to the TV, then headset B turns on.
+    var everythingOnA = new Defaults(HeadsetA, HeadsetA, MicA);
+    plan = DefaultRoles.Plan(SwitchScope.Follow, Speakers, null, everythingOnA, MicOf, HeadsetOfMic);
+    Check(plan == new SwitchPlan(Speakers, Speakers, null), "headset off: the soundbar has no mic, so the headset's stays for now");
+
+    plan = DefaultRoles.Plan(SwitchScope.Follow, Tv, null, new Defaults(Speakers, Speakers, MicA), MicOf, HeadsetOfMic);
+    Check(plan == new SwitchPlan(Tv, Tv, null), "soundbar to TV: no mic to move");
+
+    plan = DefaultRoles.Plan(SwitchScope.Follow, HeadsetB, MicB, new Defaults(Tv, Tv, MicA), MicOf, HeadsetOfMic);
+    Check(plan == new SwitchPlan(HeadsetB, HeadsetB, MicB), "headset B on after the TV (7:29 p.m.): headset A's mic, left behind, comes along");
+
+    plan = DefaultRoles.Plan(SwitchScope.Follow, HeadsetA, MicA, new Defaults(Tv, Tv, MicA), MicOf, HeadsetOfMic);
+    Check(plan == new SwitchPlan(HeadsetA, HeadsetA, null), "back to the headset whose mic it already is: nothing more to move");
+}
+
+void SeparateHeadsetMicrophones()
+{
+    Check(DefaultRoles.SeparateHeadsetOf(MicA, microphonePairs) == HeadsetA, "a headset's own mic belongs to it");
+    Check(DefaultRoles.SeparateHeadsetOf(DeskMic, microphonePairs) == null, "a desk mic belongs to no headset");
+    Check(DefaultRoles.SeparateHeadsetOf(OnboardMic, microphonePairs) == null, "the PC's own mic jack isn't a headset's");
+
+    var plan = DefaultRoles.Plan(SwitchScope.Follow, HeadsetB, MicB, new Defaults(Speakers, Speakers, OnboardMic), MicOf, HeadsetOfMic);
+    Check(plan == new SwitchPlan(HeadsetB, HeadsetB, null), "a desk mic in the PC's mic jack stays put");
 }
 
 void SwitchSingleRoles()
 {
     var together = new Defaults(HeadsetA, HeadsetA, MicA);
-    Check(DefaultRoles.Plan(SwitchScope.Output, HeadsetB, MicB, together, MicOf) == new SwitchPlan(HeadsetB, null, null), "games and media only");
-    Check(DefaultRoles.Plan(SwitchScope.Calls, HeadsetB, MicB, together, MicOf) == new SwitchPlan(null, HeadsetB, null), "calls only");
-    Check(DefaultRoles.Plan(SwitchScope.Microphone, HeadsetB, MicB, together, MicOf) == new SwitchPlan(null, null, MicB), "microphone only");
-    Check(DefaultRoles.Plan(SwitchScope.Microphone, Speakers, null, together, MicOf).IsEmpty, "speakers have no microphone to move");
-    Check(DefaultRoles.Plan(SwitchScope.All, HeadsetA, MicA, new Defaults(HeadsetA, Speakers, DeskMic), MicOf) == new SwitchPlan(null, HeadsetA, MicA),
+    Check(DefaultRoles.Plan(SwitchScope.Output, HeadsetB, MicB, together, MicOf, HeadsetOfMic) == new SwitchPlan(HeadsetB, null, null), "games and media only");
+    Check(DefaultRoles.Plan(SwitchScope.Calls, HeadsetB, MicB, together, MicOf, HeadsetOfMic) == new SwitchPlan(null, HeadsetB, null), "calls only");
+    Check(DefaultRoles.Plan(SwitchScope.Microphone, HeadsetB, MicB, together, MicOf, HeadsetOfMic) == new SwitchPlan(null, null, MicB), "microphone only");
+    Check(DefaultRoles.Plan(SwitchScope.Microphone, Speakers, null, together, MicOf, HeadsetOfMic).IsEmpty, "speakers have no microphone to move");
+    Check(DefaultRoles.Plan(SwitchScope.All, HeadsetA, MicA, new Defaults(HeadsetA, Speakers, DeskMic), MicOf, HeadsetOfMic) == new SwitchPlan(null, HeadsetA, MicA),
         "everything on the device in use moves only what isn't there yet");
 }
 
