@@ -8,7 +8,8 @@
         "layout": "split",
         "icon": "assets/generated/icon-256.png",
         "primary": "#6366F1",
-        "accent": "#22C55E"
+        "accent": "#22C55E",
+        "textFreeFile": "text-free/00-hero-dark.png"
       },
       "caption": "A Game to Chat slider for every device: in the tray, in Xbox Game Bar, or with a keyboard shortcut.",
       "alt": "ChatMixr's name and the headline \"Balance game and chat audio on any headset.\" on an indigo panel, beside ChatMixr's real tray popup, enlarged: Game to Chat sliders for the Arctis Nova 7X headphones, speakers and a TV, and the volume of the device in use."
