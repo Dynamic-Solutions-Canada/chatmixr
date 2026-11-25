@@ -184,7 +184,7 @@ public sealed class MixEngine : IDisposable
 
     /// <summary>
     /// Raised on the UI thread with the device's id when its ChatMix wheel turns (not when its position
-    /// is read at start), for the mix popup. <see cref="Snapshot"/> already has the new levels.
+    /// is first read, at start or as its headset comes on), for the mix popup. <see cref="Snapshot"/> already has the new levels.
     /// </summary>
     public event Action<string>? WheelTurned;
 
@@ -685,7 +685,12 @@ public sealed class MixEngine : IDisposable
         switch (report)
         {
             case ReceiverReport.Wheel wheel:
+                // A headset coming on sends where its wheel is. When that is the first reading (the
+                // headset was off at start, or its receiver was just plugged in), nothing turned: the mix
+                // popup would only hide the switch popup shown a moment earlier.
+                bool known = _wheels.GetValueOrDefault(containerId) != null;
                 if (OnLevels(containerId, wheel.Levels)
+                    && known
                     && _devices.Values.FirstOrDefault(d => d.Info.ContainerId == containerId) is { } turned)
                 {
                     // Queued after the snapshot OnLevels published, so the interface sees the new levels.
