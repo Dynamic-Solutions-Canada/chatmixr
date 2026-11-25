@@ -108,7 +108,7 @@ Before finishing a change, run `npm run validate` and `npm run verify:desktop` (
 | The receivers' reports or a supported receiver | `docs/protocol.md` in the same commit, `README.md`, `tests/ChatMixr.Mixing.Tests/` |
 | Where the app writes data, or a new kind of data | The data table in `docs/development.md` |
 | A setting's shape | A step in `Classes/SettingsMigrations.cs` and a scenario in `tests/ChatMixr.Settings.Tests/` |
-| winui-app-kit pin bumped | The kit's `.editorconfig` and `build/shared.gitignore` (the last part of `.gitignore`) at that tag, then `npm run format` |
+| winui-app-kit pin bumped | The `uses:` tags in `.github/workflows/store-publish.yml` and `credential-expiry.yml` (the Store workflow refuses to run when they differ from the pin); the kit's `.editorconfig` and `build/shared.gitignore` (the last part of `.gitignore`) at that tag, then `npm run format` |
 | A language or catalog rule | `.agents/guides/localization.md`, the `localization` block in `windows-build.json` |
 | A NuGet package added, removed or updated | `npm run generate:notices`, and commit the notices file |
 | The Game Bar SDK (`Microsoft.Gaming.XboxGameBar`) updated | `ChatMixrMSIX/Package.appxmanifest`: its classes from the readme, its interfaces from `ChatMixr.GameBar/list-private-interfaces.ps1`; then `npm run generate:notices` |
