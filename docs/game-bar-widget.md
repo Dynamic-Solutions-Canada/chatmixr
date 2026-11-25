@@ -1,3 +1,6 @@
+> **Scope:** The security design of the connection between the Xbox Game Bar widget and ChatMixr.
+> **Governs:** `ChatMixr/Models/WidgetProtocol.cs`, `ChatMixr/Models/AppContainerSid.cs`, `ChatMixr/Services/WidgetServer.cs`, `ChatMixr/Classes/WidgetLink.cs`, `ChatMixr.GameBar/**`
+
 # Game Bar widget: the connection to ChatMixr
 
 The widget (`ChatMixr.GameBar/`) runs sandboxed inside ChatMixr's own package and can't touch audio. It is a view: ChatMixr sends it what to show, and it sends back what the user did. This note is the security design of that connection; the standards' D-120 points here.
