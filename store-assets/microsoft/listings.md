@@ -44,7 +44,7 @@ Translated wording uses the same terms as the in-app catalogs (`ChatMixr/Localiz
 | Pricing | US $0.99 (Partner Center tier `Tier1012`, the `price_tier` in `store-publish.yml`) with a 7-day free trial, set in Partner Center |
 | Markets | All 240 markets Partner Center offers (it lists no Lebanon or Western Sahara), set in Partner Center |
 | Age rating | IARC questionnaire: all other app types, No to every question; "Online content" is No because "Our other apps" only lists the publisher's own Store-rated apps |
-| Privacy policy URL | https://www.dynamic-solutions.ca/privacy/chatmixr (D-017); live since 2026-11-22 |
+| Privacy policy URL | https://www.dynamic-solutions.ca/privacy/chatmixr (D-017); live since 2026-11-22; its source is `privacy/chatmixr.php` in the website repository |
 
 ## Screenshots
 
