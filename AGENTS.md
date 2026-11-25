@@ -52,7 +52,7 @@ Run from WSL with submodules initialised (`git submodule update --init`); setup 
 | `npm run validate` | The Linux gate: format, gitignore, icon, l10n, listing, notices, screenshot and hero checks, then `npm test` | A Windows compile; also run `verify:desktop` |
 | `npm run format` | Rewrites C# outside `external/` to the kit's style | Behaviour |
 
-`docs/development.md` covers each check `validate` runs and the generators (`icons`, `hero`, `shots:render`, `generate:notices`). Before finishing a change, run `npm run validate` and `npm run verify:desktop` (the `desktop` skill).
+`docs/development.md` covers each check `validate` runs and the generators (`icons`, `hero`, `generate:notices`); `store-assets/README.md` covers the screenshots and `shots:render`. Before finishing a change, run `npm run validate` and `npm run verify:desktop` (the `desktop` skill).
 
 ## Release
 
@@ -62,7 +62,7 @@ ChatMixr is live in the Microsoft Store; its Store ID, identity and privacy poli
 
 | Guide, doc, or skill | Read or use when | Governs |
 | --- | --- | --- |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Changing mixing, devices, defaults, headsets, shortcuts, in-game voice chat or the test sounds | `ChatMixr/Services/**`, `ChatMixr/Models/**`, the device actions |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Finding which file owns an area; changing mixing, devices, defaults, headsets, shortcuts, in-game voice chat or the test sounds | `ChatMixr/Services/**`, `ChatMixr/Models/**`, the device actions |
 | [docs/protocol.md](docs/protocol.md) | Changing how receivers are found, read or asked for status | `Models/ReceiverReport.cs`, `Services/Receivers.cs`, `Services/HidInterop.cs` |
 | [docs/development.md](docs/development.md) | Building, checking, or changing where the app writes data | Build setup, data locations, manual checks |
 | [.agents/guides/localization.md](.agents/guides/localization.md) | Any user-visible text, a language, or the language setting | `ChatMixr/Localization/**`, `Classes/AppLanguages.cs`, release notes, listing text |
