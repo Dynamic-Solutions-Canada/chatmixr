@@ -52,6 +52,38 @@ public sealed class MixEngine : IDisposable
     /// <summary>Each connected receiver's headset: on or off (null until known) and its battery.</summary>
     private readonly Dictionary<Guid, (bool? On, int? Battery)> _headsetState = new();
 
+    /// <summary>
+    /// Receivers plugged in (alone or on a hub) after the first scan, until they are unplugged: their
+    /// headset's first state counts as a change (<see cref="HeadsetPower.Before"/>).
+    /// </summary>
+    private readonly HashSet<Guid> _connectedLate = new();
+
+    /// <summary>
+    /// Headsets that came on before Windows listed their playback device, and until when auto-switching
+    /// waits for it. A replugged receiver's HID interfaces often appear a few seconds before its audio
+    /// endpoint; switching at once would pick the next device in the order instead.
+    /// </summary>
+    private readonly Dictionary<Guid, DateTime> _awaitingEndpoint = new();
+
+    /// <summary>How long auto-switching waits for a headset's playback device to appear.</summary>
+    private static readonly TimeSpan EndpointWait = TimeSpan.FromSeconds(15);
+
+    /// <summary>
+    /// Receivers unplugged while their headset was on, until they are plugged in again: their playback
+    /// devices are never picked, even in the moment before Windows removes them.
+    /// </summary>
+    private readonly HashSet<Guid> _unplugged = new();
+
+    /// <summary>
+    /// After an unplug, the earliest a scan may auto-switch, or null when none is due. Waiting a moment
+    /// lets Windows remove everything else that went with the receiver (a hub's other devices), so the
+    /// switch picks from devices that are really there.
+    /// </summary>
+    private DateTime? _switchAfterUnplug;
+
+    /// <summary>How long after an unplug the switch waits for Windows to settle.</summary>
+    private static readonly TimeSpan UnplugSettle = TimeSpan.FromSeconds(2);
+
     /// <summary>Devices hidden from the lists; auto-switching never picks them.</summary>
     private HashSet<string> _hidden = new(StringComparer.OrdinalIgnoreCase);
 
@@ -498,6 +530,20 @@ public sealed class MixEngine : IDisposable
         var openPaths = _receivers.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
         foreach (var receiver in Receiver.OpenNew(openPaths, _notChatMixPaths))
         {
+            // Late only for a receiver that wasn't connected at all: its two interfaces can open in
+            // different scans, and the second of a receiver found at start isn't a new arrival.
+            bool arrived = !_receivers.Values.Any(r => r.ContainerId == receiver.ContainerId);
+            if (arrived && _hasScanned)
+            {
+                _connectedLate.Add(receiver.ContainerId);
+            }
+
+            // Plugged back in before the switch its unplug asked for: its arrival decides instead.
+            if (_unplugged.Remove(receiver.ContainerId))
+            {
+                _switchAfterUnplug = null;
+            }
+
             _receivers[receiver.Path] = receiver;
             _wheels.TryAdd(receiver.ContainerId, null);
             receiver.Reported += (r, report) => Post(() => OnReport(r.ContainerId, report));
@@ -545,6 +591,7 @@ public sealed class MixEngine : IDisposable
         LogMicrophonePairs();
         _microphoneFix = MicrophoneFix(recording);
         _sonarRunning = IsSonarRunning();
+        SwitchAfterScan();
         _hasScanned = true;
         if (apply)
         {
@@ -659,7 +706,7 @@ public sealed class MixEngine : IDisposable
                     RequestStatus(containerId);
                 }
 
-                OnPower(containerId, state.On, power.On);
+                OnPower(containerId, HeadsetPower.Before(state.On, _connectedLate.Contains(containerId)), power.On);
                 break;
             case ReceiverReport.Status status:
                 // The answer when a receiver connects or its headset comes on: its current state, not a
@@ -670,6 +717,13 @@ public sealed class MixEngine : IDisposable
                 if (status.On)
                 {
                     OnLevels(containerId, status.Levels);
+                }
+
+                // The exception: the first answer from a receiver plugged in while ChatMixr runs is its
+                // headset arriving, a change like turning it on.
+                if (state.On == null && _connectedLate.Contains(containerId))
+                {
+                    OnPower(containerId, HeadsetPower.Before(null, connectedLate: true), status.On);
                 }
 
                 break;
@@ -688,19 +742,82 @@ public sealed class MixEngine : IDisposable
     }
 
     /// <summary>
-    /// A headset turned on or off. With auto-switch on, switch to the first device in the user's order
-    /// that is ready (<see cref="DeviceOrder.Preferred"/>): a wireless headset while it is on, any other
-    /// device always; hidden devices never. A first report (nothing known before) is not a change, and
-    /// nothing happens between changes, so a device picked with Use stays picked until the next one.
+    /// A headset turned on or off (or its receiver was plugged in). With auto-switch on, switch to the
+    /// first device in the user's order that is ready (<see cref="SwitchToPreferred"/>). A first
+    /// report from a receiver found at start is not a change (<see cref="HeadsetPower"/>), and nothing
+    /// happens between changes, so a device picked with Use stays picked until the next one.
     /// </summary>
+    /// <param name="wasOn">The state before, or null when there is nothing to compare against.</param>
     private void OnPower(Guid containerId, bool? wasOn, bool isOn)
     {
         Logger.Info("Headset {Container} turned {State}", containerId, isOn ? "on" : "off");
-        if (!_autoSwitch || wasOn == null || wasOn == isOn)
+
+        // Only turning off ends a wait: a later "on" report (the headset linking to a receiver that
+        // just powered up) is the same arrival, and must not cancel the switch it is waiting for.
+        if (!isOn)
+        {
+            _awaitingEndpoint.Remove(containerId);
+        }
+
+        if (!_autoSwitch || !HeadsetPower.IsChange(wasOn, isOn))
         {
             return;
         }
 
+        // A replugged receiver's playback device may not be listed yet: wait for it (up to EndpointWait),
+        // or the switch would go to the next device in the order. The next scans retry.
+        if (isOn && !_devices.Values.Any(d => d.Info.ContainerId == containerId))
+        {
+            Logger.Info("Waiting for headset {Container}'s playback device before auto-switching", containerId);
+            _awaitingEndpoint[containerId] = DateTime.UtcNow + EndpointWait;
+            return;
+        }
+
+        SwitchToPreferred();
+    }
+
+    /// <summary>
+    /// After a scan has refreshed the devices: auto-switch for headsets whose playback device has now
+    /// appeared, stop waiting for ones past <see cref="EndpointWait"/>, and make the switch an unplug
+    /// asked for once Windows has settled.
+    /// </summary>
+    private void SwitchAfterScan()
+    {
+        bool due = false;
+        if (_switchAfterUnplug is { } notBefore && DateTime.UtcNow >= notBefore)
+        {
+            _switchAfterUnplug = null;
+            due = true;
+        }
+
+        bool arrived = false;
+        foreach (var (container, until) in _awaitingEndpoint.ToList())
+        {
+            if (_devices.Values.Any(d => d.Info.ContainerId == container))
+            {
+                _awaitingEndpoint.Remove(container);
+                arrived = true;
+            }
+            else if (DateTime.UtcNow > until)
+            {
+                Logger.Info("Headset {Container}'s playback device never appeared; not auto-switching", container);
+                _awaitingEndpoint.Remove(container);
+            }
+        }
+
+        if ((arrived || due) && _autoSwitch)
+        {
+            SwitchToPreferred();
+        }
+    }
+
+    /// <summary>
+    /// Switch to the first device in the user's order that is ready (<see cref="DeviceOrder.Preferred"/>):
+    /// a wireless headset while it is on, any other device always; hidden devices never. Shows the device
+    /// in the on-screen popup. Nothing happens when it is already in use.
+    /// </summary>
+    private void SwitchToPreferred()
+    {
         var order = DeviceOrder.Apply(_devices.Values.Select(d => d.Info.Id).ToList(), _savedOrder);
         string? target = DeviceOrder.Preferred(order, id => !_hidden.Contains(id) && IsReady(_devices[id]));
         if (target != null && !SameId(target, _defaults.Output))
@@ -714,9 +831,19 @@ public sealed class MixEngine : IDisposable
         }
     }
 
-    /// <summary>A device auto-switching may pick: a wireless headset only while on, anything else always.</summary>
-    private bool IsReady(DeviceState device) =>
-        HeadsetOf(device) is not { } headset || headset.On == true;
+    /// <summary>
+    /// A device auto-switching may pick: a wireless headset only while on, anything else always, and
+    /// never one whose receiver was just unplugged.
+    /// </summary>
+    private bool IsReady(DeviceState device)
+    {
+        if (device.Info.ContainerId is Guid container && _unplugged.Contains(container))
+        {
+            return false;
+        }
+
+        return HeadsetOf(device) is not { } headset || headset.On == true;
+    }
 
     /// <summary>A wheel's position (moved, or read at start); true when it changed.</summary>
     private bool OnLevels(Guid containerId, MixLevels levels)
@@ -742,13 +869,32 @@ public sealed class MixEngine : IDisposable
         return true;
     }
 
+    /// <summary>
+    /// A receiver interface stopped: unplugged (alone or with its hub), or closed at exit. Once its
+    /// last interface is gone, a headset that was on counts as turning off: auto-switching runs after a
+    /// later scan (<see cref="SwitchAfterScan"/>), once Windows has removed what went with it.
+    /// </summary>
     private void OnReceiverEnded(Receiver receiver)
     {
         _receivers.Remove(receiver.Path);
-        if (!_receivers.Values.Any(r => r.ContainerId == receiver.ContainerId))
+        Guid container = receiver.ContainerId;
+        if (!_receivers.Values.Any(r => r.ContainerId == container))
         {
-            _wheels.Remove(receiver.ContainerId);
-            _headsetState.Remove(receiver.ContainerId);
+            // Never at exit, which closes every receiver itself.
+            if (_headsetState.GetValueOrDefault(container).On == true && !_disposed)
+            {
+                Logger.Info("Headset {Container}'s receiver was unplugged while on", container);
+                _unplugged.Add(container);
+                if (_autoSwitch)
+                {
+                    _switchAfterUnplug = DateTime.UtcNow + UnplugSettle;
+                }
+            }
+
+            _wheels.Remove(container);
+            _headsetState.Remove(container);
+            _connectedLate.Remove(container);
+            _awaitingEndpoint.Remove(container);
         }
 
         Publish();

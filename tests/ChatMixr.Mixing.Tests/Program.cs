@@ -40,6 +40,7 @@ var scenarios = new List<(string Name, Action Body)>
     ("devices follow the saved order, with new ones after it in Windows' order", OrderApplies),
     ("reordering keeps the place of devices that aren't connected", OrderSaveKeepsAbsent),
     ("auto-switching picks the first ready device in the user's order", PreferredDevice),
+    ("a receiver plugged in while running brings its headset on; one found at start doesn't", HeadsetPowerChanges),
     ("moving a device up or down swaps it with its neighbour, and stops at the ends", OrderMove),
     ("a Squirrel shortcut's program is the one it starts, not Update.exe", ShortcutProgram),
     ("the search ranks name starts first, leaves out chat apps, and matches program names", SearchRanking),
@@ -309,6 +310,15 @@ void PreferredDevice()
     on.Add("gen2");
     Check(DeviceOrder.Preferred(order, on.Contains) == "gen2", "the Gen 2 is first: the Gen 2");
     Check(DeviceOrder.Preferred(order, _ => false) == null, "nothing ready: no switch");
+}
+
+void HeadsetPowerChanges()
+{
+    Check(!HeadsetPower.IsChange(HeadsetPower.Before(null, connectedLate: false), true), "found at start, on: no switch");
+    Check(HeadsetPower.IsChange(HeadsetPower.Before(null, connectedLate: true), true), "plugged in (or its hub) with the headset on: turned on");
+    Check(!HeadsetPower.IsChange(HeadsetPower.Before(null, connectedLate: true), false), "plugged in with the headset off: no switch");
+    Check(HeadsetPower.IsChange(HeadsetPower.Before(true, connectedLate: false), false), "a known headset turning off: turned off");
+    Check(!HeadsetPower.IsChange(HeadsetPower.Before(true, connectedLate: true), true), "a later status answer that it's still on: no switch");
 }
 
 void OrderMove()
