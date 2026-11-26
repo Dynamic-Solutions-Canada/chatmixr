@@ -14,6 +14,10 @@ The app ships the nine-locale set from the standards' [locales.md](https://githu
 - Add every new key to all seven catalogs, then run `npm run check:l10n` (winui-app-kit's check, configured by the `localization` block in `windows-build.json`). Keys the code names through `DescriptionKey`, `LabelKey` or `HelpKey` are listed there as `extra_key_patterns`.
 - `AppDescription` is the package manifest's description (`ms-resource:Resources/AppDescription`), written into `resources.pri` for every language at packaging.
 
+## German
+
+German addresses the user as "du" and its forms, including imperatives ("Wähle", not "Wählen Sie"), in the interface, the listing, hero text and release notes (LOC-14). Release notes already published before the switch keep "Sie".
+
 ## What stays English
 
 Logs, settings values, program names and device names are never translated. WinUI's built-in control text (for example a ToggleSwitch's On and Off when the app doesn't set them) follows Windows' own language, not the app's.
