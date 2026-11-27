@@ -79,7 +79,7 @@ ChatMixr is live in the Microsoft Store; its Store ID, identity and privacy poli
 | --- | --- |
 | A file, service or window added, moved or removed | The file map in `ARCHITECTURE.md`, and Architecture above if an ownership boundary moves |
 | A UI pattern, shared style or control | `.agents/guides/ui-conventions.md` |
-| An npm command | The Commands table above, `docs/development.md`, the `desktop` skill, `paseo.json`, and `.github/workflows/ci.yml` if `validate` or the Windows compile changes |
+| An npm command | The Commands table above, `docs/development.md`, the `desktop` skill, and `.github/workflows/ci.yml` if `validate` or the Windows compile changes |
 | A mixing rule or product behaviour | `ARCHITECTURE.md` (and Behaviour above if it is a rule a change can break), `README.md`, the manual checks in `docs/development.md`, `tests/ChatMixr.Mixing.Tests/` |
 | The receivers' reports or a supported receiver | `docs/protocol.md` in the same commit, `README.md`, `tests/ChatMixr.Mixing.Tests/` |
 | Where the app writes data, or a new kind of data | The data table in `docs/development.md` |
