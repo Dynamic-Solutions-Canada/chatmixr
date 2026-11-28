@@ -20,8 +20,8 @@ public sealed partial class OsdWindow : Window
 {
     private const double WidthDip = 300, HeightDip = 56;
 
-    /// <summary>How long the mix stays after the last change before fading.</summary>
-    private static readonly TimeSpan MixHold = TimeSpan.FromSeconds(1.5);
+    /// <summary>How long the mix stays after the last change before fading; a wheel's small steps follow it for as long.</summary>
+    private static readonly TimeSpan MixHold = MixPopup.Hold;
 
     /// <summary>How long a switch stays: a little longer, since it is read rather than glanced at.</summary>
     private static readonly TimeSpan SwitchHold = TimeSpan.FromSeconds(2.5);

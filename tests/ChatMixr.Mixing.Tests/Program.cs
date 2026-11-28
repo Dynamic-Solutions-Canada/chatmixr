@@ -41,6 +41,8 @@ var scenarios = new List<(string Name, Action Body)>
     ("reordering keeps the place of devices that aren't connected", OrderSaveKeepsAbsent),
     ("auto-switching picks the first ready device in the user's order", PreferredDevice),
     ("a receiver plugged in while running brings its headset on; one found at start doesn't", HeadsetPowerChanges),
+    ("a wheel's flicker of a step or two never shows the mix popup; a real turn does, and it follows smoothly", WheelPopupIgnoresFlicker),
+    ("a wheel that keeps flickering after a turn can't hold the popup open", WheelPopupFlickerAfterTurn),
     ("moving a device up or down swaps it with its neighbour, and stops at the ends", OrderMove),
     ("a Squirrel shortcut's program is the one it starts, not Update.exe", ShortcutProgram),
     ("the search ranks name starts first, leaves out chat apps, and matches program names", SearchRanking),
@@ -319,6 +321,69 @@ void HeadsetPowerChanges()
     Check(!HeadsetPower.IsChange(HeadsetPower.Before(null, connectedLate: true), false), "plugged in with the headset off: no switch");
     Check(HeadsetPower.IsChange(HeadsetPower.Before(true, connectedLate: false), false), "a known headset turning off: turned off");
     Check(!HeadsetPower.IsChange(HeadsetPower.Before(true, connectedLate: true), true), "a later status answer that it's still on: no switch");
+}
+
+void WheelPopupIgnoresFlicker()
+{
+    // Resting at game 82 (as in a real log), settled by the status answer when the headset came on.
+    var state = MixPopup.Settled(new MixLevels(82, 100));
+    var t = TimeSpan.FromSeconds(100);
+
+    // Flicker a step or two either way, and back, at any pace: never shown.
+    foreach (int game in new[] { 81, 82, 83, 81, 80, 82 })
+    {
+        t += TimeSpan.FromSeconds(3);
+        (bool show, state) = MixPopup.Turned(state, new MixLevels(game, 100), t);
+        Check(!show, $"flicker to game {game} stays hidden");
+    }
+
+    // A slow turn, one step per report: shows from the third step, then follows every step.
+    var shown = new List<bool>();
+    foreach (int game in new[] { 81, 80, 79, 78, 77, 76, 75 })
+    {
+        t += TimeSpan.FromMilliseconds(100);
+        (bool show, state) = MixPopup.Turned(state, new MixLevels(game, 100), t);
+        shown.Add(show);
+    }
+
+    Check(shown.SequenceEqual([false, false, true, true, true, true, true]), "a turn shows from its third step and follows each one after");
+
+    // Once the popup has gone, the turn's end is where flicker is measured from.
+    t += TimeSpan.FromSeconds(5);
+    (bool after, state) = MixPopup.Turned(state, new MixLevels(74, 100), t);
+    Check(!after, "a step from the turn's end, later, stays hidden");
+
+    // Across the middle, the larger side counts: game 99 to chat 99 is one step each, not a turn.
+    var middle = MixPopup.Settled(new MixLevels(99, 100));
+    Check(!MixPopup.Turned(middle, new MixLevels(100, 99), t).Show, "a flicker across the middle stays hidden");
+    Check(MixPopup.Turned(null, new MixLevels(50, 100), t).Show, "with nothing known, a turn shows");
+}
+
+void WheelPopupFlickerAfterTurn()
+{
+    var state = MixPopup.Settled(new MixLevels(100, 100));
+    var t = TimeSpan.FromSeconds(10);
+    (bool show, state) = MixPopup.Turned(state, new MixLevels(100, 90), t);
+    Check(show, "a turn of ten steps shows");
+
+    // The wheel then flickers between 89 and 90 every 200 ms: shown while the popup is up, then never
+    // again, because the flicker doesn't extend its hold.
+    var lastShown = t;
+    for (int i = 0; i < 30; i++)
+    {
+        t += TimeSpan.FromMilliseconds(200);
+        (show, state) = MixPopup.Turned(state, new MixLevels(100, i % 2 == 0 ? 89 : 90), t);
+        if (show)
+        {
+            lastShown = t;
+        }
+    }
+
+    Check(lastShown < TimeSpan.FromSeconds(10) + MixPopup.Hold, "flicker stops showing once the turn's hold runs out");
+
+    // A status answer (the headset turned off and on, say) settles the wheel where it now is.
+    state = MixPopup.Settled(new MixLevels(100, 70));
+    Check(!MixPopup.Turned(state, new MixLevels(100, 71), t).Show, "flicker after a status answer is measured from it, and stays hidden");
 }
 
 void OrderMove()

@@ -20,7 +20,7 @@
 | Mixing: audio thread, passes, devices, receivers, restore on exit | `Services/MixEngine.cs` |
 | Windows' default devices | `Services/DefaultDevices.cs` (reads and switches), `Services/AudioPolicy.cs` (the calls); what a switch moves in `Models/DefaultRoles.cs` |
 | The guided VB-Cable setup | `Classes/ChatDeviceSetup.cs` |
-| The on-screen mix and switch popup | `Windows/OsdWindow.xaml(.cs)` |
+| The on-screen mix and switch popup, and when a wheel shows it | `Windows/OsdWindow.xaml(.cs)`, `Models/MixPopup.cs` |
 | Styles for rows, badges and notes built in code | `Styles/RowStyles.xaml`, `Classes/CardRow.cs`, `Classes/Pill.cs` |
 | The device test sounds | `Services/TestPlayer.cs`, `Models/TestSignal.cs` |
 | In-game voice chat's relay | `Services/ChatRelay.cs`; buffer, drift and cable pairing in `Models/RelayBuffer.cs`, `Models/RelaySilence.cs`, `Models/ChatDevicePairing.cs` |
@@ -77,7 +77,7 @@
 ## Shortcuts and the mix popup
 
 - **Mix shortcuts (off by default, Settings):** two global shortcuts (Ctrl+Shift+Plus / Minus by default, recorded by the user on the Settings page; `Models/Shortcut.cs` has the rules: a modifier and a real key, and the two must differ) move the device in use 10 steps toward chat / game, stopping at the middle; nothing on a wheel device. Global hotkeys registered on the host window (`Classes/MixShortcuts.cs`); while on, other apps don't receive those keys, and the Settings page says when another app already holds one.
-- **Mix popup:** a ChatMix wheel turn or a mix shortcut press shows the device and its Game-to-Chat position bottom-centre on the main display, like Windows' volume popup: never activates, click-through, holds 1.5 s after the last change, then fades. Not for a wheel's first reading (at start, or when a headset that was off or a replugged receiver reports it), and not while the tray popup is open.
+- **Mix popup:** a ChatMix wheel turn or a mix shortcut press shows the device and its Game-to-Chat position bottom-centre on the main display, like Windows' volume popup: never activates, click-through, holds 1.5 s after the last change, then fades. Not for a wheel's first reading (at start, or when a headset that was off or a replugged receiver reports it), and not while the tray popup is open. A wheel shows it only once it is 3 steps from where the popup last left it, since a resting wheel can flicker a step or two on its own; once shown, smaller steps follow it, but only another 3-step move keeps it up longer (`Models/MixPopup.cs`). The mix itself always follows the wheel exactly. The log records each turn that opens it, and the changes left out (at most one line per 30 s per wheel, with a count).
 
 ## Chat apps page
 

@@ -49,6 +49,15 @@ public sealed class MixEngine : IDisposable
     private readonly HashSet<string> _notChatMixPaths = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<Guid, MixLevels?> _wheels = new();
 
+    /// <summary>Each wheel's mix popup state, so a wheel's flicker doesn't show the popup (<see cref="MixPopup"/>).</summary>
+    private readonly Dictionary<Guid, MixPopup.State> _wheelPopups = new();
+
+    /// <summary>How often a flickering wheel's ignored steps are logged, at most.</summary>
+    private static readonly TimeSpan IgnoredStepLogInterval = TimeSpan.FromSeconds(30);
+
+    /// <summary>Per wheel: when an ignored step was last logged, and how many were left out of the log since.</summary>
+    private readonly Dictionary<Guid, (TimeSpan LoggedAt, int Unlogged)> _ignoredSteps = new();
+
     /// <summary>Each connected receiver's headset: on or off (null until known) and its battery.</summary>
     private readonly Dictionary<Guid, (bool? On, int? Battery)> _headsetState = new();
 
@@ -687,10 +696,21 @@ public sealed class MixEngine : IDisposable
             case ReceiverReport.Wheel wheel:
                 // A headset coming on sends where its wheel is. When that is the first reading (the
                 // headset was off at start, or its receiver was just plugged in), nothing turned: the mix
-                // popup would only hide the switch popup shown a moment earlier.
+                // popup would only hide the switch popup shown a moment earlier. After that, a step or two
+                // is often the wheel's own flicker, so the popup waits for a real move (ShowsPopup).
                 bool known = _wheels.GetValueOrDefault(containerId) != null;
-                if (OnLevels(containerId, wheel.Levels)
-                    && known
+                if (!OnLevels(containerId, wheel.Levels))
+                {
+                    return;
+                }
+
+                if (!known)
+                {
+                    _wheelPopups[containerId] = MixPopup.Settled(wheel.Levels);
+                    return;
+                }
+
+                if (ShowsPopup(containerId, wheel.Levels)
                     && _devices.Values.FirstOrDefault(d => d.Info.ContainerId == containerId) is { } turned)
                 {
                     // Queued after the snapshot OnLevels published, so the interface sees the new levels.
@@ -758,6 +778,7 @@ public sealed class MixEngine : IDisposable
         Logger.Info("Headset {Container} turned {State}", containerId, isOn ? "on" : "off");
 
         // Only turning off ends a wait: a later "on" report (the headset linking to a receiver that
+                    _wheelPopups[containerId] = MixPopup.Settled(status.Levels);
         // just powered up) is the same arrival, and must not cancel the switch it is waiting for.
         if (!isOn)
         {
@@ -931,6 +952,54 @@ public sealed class MixEngine : IDisposable
     private void ApplyAll()
     {
         var live = new HashSet<string>();
+    /// <summary>
+    /// Whether a wheel's turn to <paramref name="levels"/> shows the mix popup, or is too small to be
+    /// more than the wheel's own flicker (<see cref="MixPopup"/>). Logs each one left out, so how often a
+    /// headset's wheel flickers, and by how much, can be read from the log.
+    /// </summary>
+    private bool ShowsPopup(Guid containerId, MixLevels levels)
+    {
+        var now = TimeSpan.FromMilliseconds(Environment.TickCount64);
+        MixPopup.State? state = _wheelPopups.TryGetValue(containerId, out var known) ? known : null;
+        var (show, next) = MixPopup.Turned(state, levels, now);
+        _wheelPopups[containerId] = next;
+
+        // The popup opening from closed: one line per turn, so a popup that still seems random can be
+        // matched to what the wheel reported.
+        bool wasOpen = state is { } previous && now < previous.OpenUntil;
+        if (show && !wasOpen && state is { } from)
+        {
+            Logger.Info(
+                "Wheel {Container} turned from game {FromGame}, chat {FromChat} to game {Game}, chat {Chat}: popup shown",
+                containerId, from.Rest.Game, from.Rest.Chat, levels.Game, levels.Chat);
+        }
+
+        if (!show)
+        {
+            LogIgnoredStep(containerId, levels, next.Rest, now);
+        }
+
+        return show;
+    }
+
+    /// <summary>
+    /// Log a wheel step too small for the popup, at most once per <see cref="IgnoredStepLogInterval"/>
+    /// per wheel with a count of those in between, so a wheel that chatters all day can't fill the log.
+    /// </summary>
+    private void LogIgnoredStep(Guid containerId, MixLevels levels, MixLevels shown, TimeSpan now)
+    {
+        if (_ignoredSteps.TryGetValue(containerId, out var last) && now - last.LoggedAt < IgnoredStepLogInterval)
+        {
+            _ignoredSteps[containerId] = (last.LoggedAt, last.Unlogged + 1);
+            return;
+        }
+
+        Logger.Info(
+            "Wheel {Container} moved too little for the popup: game {Game}, chat {Chat} (popup last showed game {ShownGame}, chat {ShownChat}; {Unlogged} more since the last line)",
+            containerId, levels.Game, levels.Chat, shown.Game, shown.Chat, last.Unlogged);
+        _ignoredSteps[containerId] = (now, 0);
+    }
+
         var playing = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var device in _devices.Values)
         {
@@ -978,6 +1047,8 @@ public sealed class MixEngine : IDisposable
                 session.Volume = volume;
             }
         });
+            _wheelPopups.Remove(container);
+            _ignoredSteps.Remove(container);
     }
 
     private void SaveBaselinesIfChanged()
