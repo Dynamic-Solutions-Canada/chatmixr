@@ -27,6 +27,14 @@ public sealed class UserSettings
     public bool AutoSwitchHeadsets { get; set; } = true;
 
     /// <summary>
+    /// Switch to a device other than a wireless headset (a TV, monitor or speakers) when it appears and
+    /// is first among the ready devices in the user's order, and to the first ready device when the one
+    /// in use goes away. Off by default, since a display's sound device comes and goes each time it
+    /// wakes or changes input. Absent from older files, which load it as off.
+    /// </summary>
+    public bool AutoSwitchDevices { get; set; }
+
+    /// <summary>
     /// The mix shortcuts (<see cref="ShortcutTowardChat"/> and <see cref="ShortcutTowardGame"/>) move the
     /// device in use toward chat / game. Off by default, since while on, those combinations stop
     /// reaching other apps.

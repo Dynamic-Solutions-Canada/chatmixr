@@ -20,6 +20,7 @@ public sealed partial class GeneralPage : Page
 
         // Switch labels and help (catalog keys), set here so the catalog check sees them.
         AutoSwitchSwitch.LabelKey = "settings.auto-switch";
+        AutoSwitchDevicesSwitch.LabelKey = "settings.auto-switch-devices";
         ShortcutsSwitch.LabelKey = "settings.shortcuts";
 
         StartupRow.Registration = MainWindow.Startup;
@@ -48,6 +49,7 @@ public sealed partial class GeneralPage : Page
 
         _settingShortcuts = true;
         AutoSwitchSwitch.IsOn = SettingsManager.Current.AutoSwitchHeadsets;
+        AutoSwitchDevicesSwitch.IsOn = SettingsManager.Current.AutoSwitchDevices;
         ShortcutsSwitch.IsOn = SettingsManager.Current.MixShortcuts;
         _settingShortcuts = false;
         ShowShortcuts(null);
@@ -74,6 +76,17 @@ public sealed partial class GeneralPage : Page
         AppOptions.SetAutoSwitch(AutoSwitchSwitch.IsOn);
     }
 
+    // ── Device auto-switch ──────────────────────────────────────────────
+    private void AutoSwitchDevicesSwitch_Toggled(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        if (_settingShortcuts)
+        {
+            return;
+        }
+
+        AppOptions.SetAutoSwitchDevices(AutoSwitchDevicesSwitch.IsOn);
+    }
+
     // ── Mix shortcuts ─────────────────────────────────────────────────
     /// <summary>True while the switches are set in code, so that isn't taken as the user's choice.</summary>
     private bool _settingShortcuts;
@@ -97,6 +110,7 @@ public sealed partial class GeneralPage : Page
     {
         _settingShortcuts = true;
         AutoSwitchSwitch.IsOn = SettingsManager.Current.AutoSwitchHeadsets;
+        AutoSwitchDevicesSwitch.IsOn = SettingsManager.Current.AutoSwitchDevices;
         ShortcutsSwitch.IsOn = SettingsManager.Current.MixShortcuts;
         _settingShortcuts = false;
         ShowShortcuts(null);

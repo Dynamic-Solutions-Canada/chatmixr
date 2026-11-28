@@ -30,7 +30,7 @@ For anyone whose voice chat and game sound fight over the same headphones. Windo
 - **Arctis ChatMix wheels, without GG:** each connected Arctis Nova 7 receiver's wheel controls its own headset, so a desk headset and a couch headset both work at once. Battery and power show on each headset's card.
 - **Chat against everything else:** Discord, Teams, Zoom, Slack, TeamSpeak, Mumble and other common chat apps are listed to start with, and you can add or remove any program.
 - **In-game voice chat:** voice chat built into a game can have its own channel too. ChatMixr walks you through installing the free VB-Cable, then mixes it separately from the game's sound.
-- **Switch devices the way you use them:** Switch to a headset and its microphone comes along, even after speakers or a TV; a separate microphone stays put. Calls follow when they were on the device you leave. Turn a headset on or off and ChatMixr can switch for you.
+- **Switch devices the way you use them:** Switch to a headset and its microphone comes along, even after speakers or a TV; a separate microphone stays put. Calls follow when they were on the device you leave. Turn a headset, TV or speaker on or off and ChatMixr can switch for you.
 - **Shortcuts and a popup:** optional keyboard shortcuts move the mix from any app, and a popup like Windows' volume popup shows the balance when a shortcut or wheel moves it.
 - **In Xbox Game Bar:** press Win+G for a widget that moves the mix, switches devices and turns in-game voice chat on or off without leaving your game.
 - **Hear it work:** Test plays a game sound and a chat sound together until you stop it, so you can move the slider or wheel and hear the balance change.

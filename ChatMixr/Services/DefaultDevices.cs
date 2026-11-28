@@ -56,8 +56,29 @@ internal sealed class DefaultDevices
             RememberCalls(calls);
         }
 
+        // Moved without ChatMixr: remember what it moved off, in case that device went away.
+        if (_seenOutput != null && !Same(_seenOutput, Output))
+        {
+            _movedOff = _seenOutput;
+        }
+
         _seenOutput = Output;
     }
+
+    /// <summary>
+    /// The playback device games and media last moved off without ChatMixr (Windows' picker, another
+    /// app, or Windows itself when the device went away), or null; cleared once taken. The engine takes
+    /// it after each scan to tell whether the device in use was removed (<see cref="DeviceChanges.InUseWentAway"/>).
+    /// </summary>
+    public string? TakeMovedOff()
+    {
+        string? movedOff = _movedOff;
+        _movedOff = null;
+        return movedOff;
+    }
+
+    /// <summary>The device the output last moved off without ChatMixr, until <see cref="TakeMovedOff"/>.</summary>
+    private string? _movedOff;
 
     /// <summary>
     /// The output as of the last read, or as ChatMixr just set it: a later change from it was made

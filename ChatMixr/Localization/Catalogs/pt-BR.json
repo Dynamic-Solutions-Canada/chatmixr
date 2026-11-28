@@ -109,6 +109,8 @@
   "settings.appearance": "Aparência",
   "settings.auto-switch": "Trocar de dispositivo quando um headset liga ou desliga",
   "settings.auto-switch-note": "O ChatMixr passa a usar o primeiro dispositivo pronto na sua ordem da página Dispositivos: um headset SteelSeries Arctis enquanto estiver ligado, qualquer outro sempre. Desative se outro app escolher seu dispositivo de áudio.",
+  "settings.auto-switch-devices": "Trocar de dispositivo quando uma TV, um monitor ou caixas de som ligam ou desligam",
+  "settings.auto-switch-devices-note": "Quando um deles fica disponível e é o primeiro dos dispositivos prontos na sua ordem da página Dispositivos, o ChatMixr passa para ele; quando o dispositivo em uso some, passa para o primeiro pronto. Desativado por padrão, porque o som de uma TV ou monitor aparece e some sempre que a tela acorda ou muda de entrada.",
   "settings.behaviour": "Geral",
   "settings.devices-and-keys": "Dispositivos e atalhos",
   "settings.reset": "Redefinir",

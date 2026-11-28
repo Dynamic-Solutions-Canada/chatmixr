@@ -109,6 +109,8 @@
   "settings.appearance": "Apariencia",
   "settings.auto-switch": "Cambiar de dispositivo al encender o apagar unos auriculares",
   "settings.auto-switch-note": "ChatMixr usa entonces el primer dispositivo listo de tu orden en la página Dispositivos: unos auriculares SteelSeries Arctis mientras están encendidos, cualquier otro siempre. Desactívalo si otra aplicación elige tu dispositivo de audio.",
+  "settings.auto-switch-devices": "Cambiar de dispositivo al encender o apagar una televisión, un monitor o unos altavoces",
+  "settings.auto-switch-devices-note": "Cuando uno pasa a estar disponible y es el primero de los dispositivos listos en tu orden de la página Dispositivos, ChatMixr cambia a él; cuando el dispositivo en uso desaparece, cambia al primero listo. Desactivado por defecto, porque el sonido de una televisión o un monitor aparece y desaparece cada vez que la pantalla se activa o cambia de entrada.",
   "settings.behaviour": "General",
   "settings.devices-and-keys": "Dispositivos y atajos",
   "settings.reset": "Restablecer",

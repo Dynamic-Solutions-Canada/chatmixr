@@ -109,6 +109,8 @@
   "settings.appearance": "外観",
   "settings.auto-switch": "ヘッドセットのオン/オフでデバイスを切り替える",
   "settings.auto-switch-note": "ChatMixr は、[デバイス] ページの順序で最初に準備ができているデバイスを使います。SteelSeries Arctis ヘッドセットは電源が入っている間、その他のデバイスは常に対象です。別のアプリがオーディオ デバイスを選ぶ場合はオフにしてください。",
+  "settings.auto-switch-devices": "テレビ、モニター、スピーカーのオン/オフでデバイスを切り替える",
+  "settings.auto-switch-devices-note": "いずれかが使えるようになり、[デバイス] ページの順序で準備ができているデバイスの先頭になると、ChatMixr はそのデバイスに切り替えます。使用中のデバイスがなくなると、最初に準備ができているデバイスに切り替えます。テレビやモニターの音声は画面のスリープ解除や入力切り替えのたびに現れたり消えたりするため、既定ではオフです。",
   "settings.behaviour": "全般",
   "settings.devices-and-keys": "デバイスとショートカット",
   "settings.reset": "リセット",

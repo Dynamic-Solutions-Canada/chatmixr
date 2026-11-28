@@ -1,8 +1,8 @@
 namespace ChatMixr.Classes;
 
 /// <summary>
-/// The options both the tray popup and the Settings page switch (headset auto-switching and the mix
-/// shortcuts), in one place: each saves the setting, applies it, and raises <see cref="Changed"/> so
+/// The options both the tray popup and the Settings page switch (auto-switching for headsets and for
+/// other devices, and the mix shortcuts), in one place: each saves the setting, applies it, and raises <see cref="Changed"/> so
 /// the other place shows the same state.
 /// </summary>
 internal static class AppOptions
@@ -21,6 +21,20 @@ internal static class AppOptions
         SettingsManager.Current.AutoSwitchHeadsets = on;
         SettingsManager.Save();
         MainWindow.Engine.SetAutoSwitch(on);
+        Changed?.Invoke();
+    }
+
+    /// <summary>Switch devices when a TV, monitor or speaker appears, or the device in use goes away.</summary>
+    public static void SetAutoSwitchDevices(bool on)
+    {
+        if (SettingsManager.Current.AutoSwitchDevices == on)
+        {
+            return;
+        }
+
+        SettingsManager.Current.AutoSwitchDevices = on;
+        SettingsManager.Save();
+        MainWindow.Engine.SetAutoSwitchDevices(on);
         Changed?.Invoke();
     }
 

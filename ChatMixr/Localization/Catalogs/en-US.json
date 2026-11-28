@@ -109,6 +109,8 @@
   "settings.appearance": "Appearance",
   "settings.auto-switch": "Switch devices when a headset turns on or off",
   "settings.auto-switch-note": "ChatMixr then uses the first ready device in your order on the Devices page: a SteelSeries Arctis headset while it's on, any other device always. Turn this off if another app picks your audio device.",
+  "settings.auto-switch-devices": "Switch devices when a TV, monitor or speaker turns on or off",
+  "settings.auto-switch-devices-note": "When one becomes available and is first among the ready devices in your order on the Devices page, ChatMixr switches to it; when the device in use goes away, it switches to the first ready one. Off by default, because a TV's or monitor's sound comes and goes each time its screen wakes or changes input.",
   "settings.behaviour": "General",
   "settings.devices-and-keys": "Devices and shortcuts",
   "settings.reset": "Reset",

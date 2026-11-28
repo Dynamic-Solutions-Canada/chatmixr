@@ -44,6 +44,8 @@ public sealed partial class MixFlyout : Window
         InGameChatSwitch.HelpKey = "in-game-chat.help";
         AutoSwitchSwitch.LabelKey = "settings.auto-switch";
         AutoSwitchSwitch.HelpKey = "settings.auto-switch-note";
+        AutoSwitchDevicesSwitch.LabelKey = "settings.auto-switch-devices";
+        AutoSwitchDevicesSwitch.HelpKey = "settings.auto-switch-devices-note";
         ShortcutsSwitch.LabelKey = "settings.shortcuts";
         ShortcutsSwitch.HelpKey = "flyout.shortcuts-help";
         _engine = engine;
@@ -152,6 +154,7 @@ public sealed partial class MixFlyout : Window
         _settingSwitch = true;
         InGameChatSwitch.IsOn = SettingsManager.Current.InGameVoiceChat;
         AutoSwitchSwitch.IsOn = SettingsManager.Current.AutoSwitchHeadsets;
+        AutoSwitchDevicesSwitch.IsOn = SettingsManager.Current.AutoSwitchDevices;
         ShortcutsSwitch.IsOn = SettingsManager.Current.MixShortcuts;
         _settingSwitch = false;
         bool virtualChat = snapshot.CableName != null && SettingsManager.Current.InGameVoiceChat;
@@ -232,6 +235,14 @@ public sealed partial class MixFlyout : Window
         if (!_settingSwitch)
         {
             AppOptions.SetAutoSwitch(AutoSwitchSwitch.IsOn);
+        }
+    }
+
+    private void AutoSwitchDevicesSwitch_Toggled(object sender, RoutedEventArgs e)
+    {
+        if (!_settingSwitch)
+        {
+            AppOptions.SetAutoSwitchDevices(AutoSwitchDevicesSwitch.IsOn);
         }
     }
 

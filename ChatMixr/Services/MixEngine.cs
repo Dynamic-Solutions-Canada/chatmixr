@@ -97,6 +97,25 @@ public sealed class MixEngine : IDisposable
     private HashSet<string> _hidden = new(StringComparer.OrdinalIgnoreCase);
 
     private bool _autoSwitch;
+
+    /// <summary>
+    /// Switch when a device other than a wireless headset appears or the device in use goes away
+    /// (<see cref="DeviceChanges"/>).
+    /// </summary>
+    private bool _autoSwitchDevices;
+
+    /// <summary>
+    /// Devices the last scan found for the first time. Each is judged one scan later, so a headset's
+    /// playback device listed a moment before its receiver opens isn't taken for a TV or speaker, and a
+    /// device that flickers in and out (a display changing input) is never switched to.
+    /// </summary>
+    private HashSet<string> _arrivedLastScan = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Devices the last scan found gone. Kept one scan longer, since Windows can move its default off
+    /// a device in the pass after the scan that saw it go (<see cref="SwitchForDeviceChanges"/>).
+    /// </summary>
+    private HashSet<string> _removedLastScan = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, DeviceState> _devices = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, int> _sliderPositions;
     private IReadOnlyList<string> _savedOrder;
@@ -152,11 +171,13 @@ public sealed class MixEngine : IDisposable
     /// <param name="separateChat">True when in-game voice chat goes through the virtual cable.</param>
     /// <param name="renameCable">True to give the cable's two ends ChatMixr's clearer names.</param>
     /// <param name="autoSwitch">True to switch to a headset when it turns on, and back when it turns off.</param>
+    /// <param name="autoSwitchDevices">True to switch when another device appears or the device in use goes away.</param>
     /// <param name="callsDevice">The calls device from settings, or null.</param>
-    internal MixEngine(BaselineFile baselineFile, IReadOnlyList<string> chatApps, IReadOnlyDictionary<string, int> sliderPositions, IReadOnlyList<string> deviceOrder, bool separateChat, bool renameCable, bool autoSwitch, string? callsDevice)
+    internal MixEngine(BaselineFile baselineFile, IReadOnlyList<string> chatApps, IReadOnlyDictionary<string, int> sliderPositions, IReadOnlyList<string> deviceOrder, bool separateChat, bool renameCable, bool autoSwitch, bool autoSwitchDevices, string? callsDevice)
     {
         _defaults = new DefaultDevices(callsDevice);
         _autoSwitch = autoSwitch;
+        _autoSwitchDevices = autoSwitchDevices;
         _renameCable = renameCable;
         _separateChat = separateChat;
         _ui = DispatcherQueue.GetForCurrentThread();
@@ -414,6 +435,9 @@ public sealed class MixEngine : IDisposable
     /// <summary>Turn switching to headsets as they turn on and off on or off.</summary>
     public void SetAutoSwitch(bool on) => Post(() => _autoSwitch = on);
 
+    /// <summary>Turn switching as other devices appear and go away on or off.</summary>
+    public void SetAutoSwitchDevices(bool on) => Post(() => _autoSwitchDevices = on);
+
     /// <summary>The devices hidden from the lists, which auto-switching skips.</summary>
     public void SetHiddenDevices(IEnumerable<string> hidden)
     {
@@ -579,9 +603,12 @@ public sealed class MixEngine : IDisposable
         // Virtual devices (the cable, Sonar's) are routes ChatMixr manages, not things anyone listens
         // to: they are never listed or mixed.
         var present = all.Where(o => !ChatDevicePairing.IsVirtual(o.ForPairing)).ToList();
+        var arrivedNow = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var removedNow = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (string gone in _devices.Keys.Where(id => !present.Any(o => SameId(o.Id, id))).ToList())
         {
             _devices.Remove(gone);
+            removedNow.Add(gone);
         }
 
         foreach (var output in present)
@@ -593,6 +620,12 @@ public sealed class MixEngine : IDisposable
             else
             {
                 _devices[output.Id] = new DeviceState(output);
+
+                // The first scan lists what was already there, which never counts as arriving.
+                if (_hasScanned)
+                {
+                    arrivedNow.Add(output.Id);
+                }
             }
         }
 
@@ -601,6 +634,9 @@ public sealed class MixEngine : IDisposable
         _microphoneFix = MicrophoneFix(recording);
         _sonarRunning = IsSonarRunning();
         SwitchAfterScan();
+        SwitchForDeviceChanges(removedNow);
+        _arrivedLastScan = arrivedNow;
+        _removedLastScan = removedNow;
         _hasScanned = true;
         if (apply)
         {
@@ -742,6 +778,7 @@ public sealed class MixEngine : IDisposable
                 if (status.On)
                 {
                     OnLevels(containerId, status.Levels);
+                    _wheelPopups[containerId] = MixPopup.Settled(status.Levels);
                 }
 
                 // The exception: the first answer from a receiver plugged in while ChatMixr runs is its
@@ -778,7 +815,6 @@ public sealed class MixEngine : IDisposable
         Logger.Info("Headset {Container} turned {State}", containerId, isOn ? "on" : "off");
 
         // Only turning off ends a wait: a later "on" report (the headset linking to a receiver that
-                    _wheelPopups[containerId] = MixPopup.Settled(status.Levels);
         // just powered up) is the same arrival, and must not cancel the switch it is waiting for.
         if (!isOn)
         {
@@ -842,10 +878,55 @@ public sealed class MixEngine : IDisposable
     /// a wireless headset while it is on, any other device always; hidden devices never. Shows the device
     /// in the on-screen popup. Nothing happens when it is already in use.
     /// </summary>
-    private void SwitchToPreferred()
+    private void SwitchToPreferred() => AutoSwitchTo(PreferredDevice());
+
+    /// <summary>The first ready, unhidden device in the user's order, or null when none is.</summary>
+    private string? PreferredDevice()
     {
         var order = DeviceOrder.Apply(_devices.Values.Select(d => d.Info.Id).ToList(), _savedOrder);
-        string? target = DeviceOrder.Preferred(order, id => !_hidden.Contains(id) && IsReady(_devices[id]));
+        return DeviceOrder.Preferred(order, id => !_hidden.Contains(id) && IsReady(_devices[id]));
+    }
+
+    /// <summary>
+    /// After a scan, with "Switch when a device becomes available" on: switch to a device that has now
+    /// been there a full scan when it is first in the user's order among the ready ones, and to the
+    /// first ready device when the device in use went away (<see cref="DeviceChanges"/>). Wireless
+    /// headsets are left to their receivers (<see cref="OnPower"/>), and an unplugged receiver's own
+    /// switch (<see cref="SwitchAfterScan"/>) is never doubled.
+    /// </summary>
+    /// <param name="removedNow">Listed devices this scan found gone.</param>
+    private void SwitchForDeviceChanges(HashSet<string> removedNow)
+    {
+        // Taken every scan, so a move from long ago is never acted on once the setting is turned on.
+        string? movedOff = _defaults.TakeMovedOff();
+        if (!_autoSwitchDevices || _switchAfterUnplug != null)
+        {
+            return;
+        }
+
+        if (DeviceChanges.InUseWentAway(movedOff, removedNow.Concat(_removedLastScan)))
+        {
+            Logger.Info("The device in use ({Device}) went away", movedOff);
+            SwitchToPreferred();
+            return;
+        }
+
+        var arrived = _arrivedLastScan
+            .Where(id => _devices.TryGetValue(id, out var device) && HeadsetOf(device) == null)
+            .ToList();
+        if (arrived.Count > 0 && DeviceChanges.ArrivalTarget(PreferredDevice(), arrived) is { } target)
+        {
+            Logger.Info("{Device} became available", _devices[target].Info.Name);
+            AutoSwitchTo(target);
+        }
+    }
+
+    /// <summary>
+    /// Switch to <paramref name="target"/> as auto-switching does, and show it in the on-screen popup.
+    /// Nothing happens when it is null or already in use.
+    /// </summary>
+    private void AutoSwitchTo(string? target)
+    {
         if (target != null && !SameId(target, _defaults.Output))
         {
             Logger.Info("Auto-switching to {Device}: the first ready device in the user's order", _devices[target].Info.Name);
@@ -869,6 +950,54 @@ public sealed class MixEngine : IDisposable
         }
 
         return HeadsetOf(device) is not { } headset || headset.On == true;
+    }
+
+    /// <summary>
+    /// Whether a wheel's turn to <paramref name="levels"/> shows the mix popup, or is too small to be
+    /// more than the wheel's own flicker (<see cref="MixPopup"/>). Logs each one left out, so how often a
+    /// headset's wheel flickers, and by how much, can be read from the log.
+    /// </summary>
+    private bool ShowsPopup(Guid containerId, MixLevels levels)
+    {
+        var now = TimeSpan.FromMilliseconds(Environment.TickCount64);
+        MixPopup.State? state = _wheelPopups.TryGetValue(containerId, out var known) ? known : null;
+        var (show, next) = MixPopup.Turned(state, levels, now);
+        _wheelPopups[containerId] = next;
+
+        // The popup opening from closed: one line per turn, so a popup that still seems random can be
+        // matched to what the wheel reported.
+        bool wasOpen = state is { } previous && now < previous.OpenUntil;
+        if (show && !wasOpen && state is { } from)
+        {
+            Logger.Info(
+                "Wheel {Container} turned from game {FromGame}, chat {FromChat} to game {Game}, chat {Chat}: popup shown",
+                containerId, from.Rest.Game, from.Rest.Chat, levels.Game, levels.Chat);
+        }
+
+        if (!show)
+        {
+            LogIgnoredStep(containerId, levels, next.Rest, now);
+        }
+
+        return show;
+    }
+
+    /// <summary>
+    /// Log a wheel step too small for the popup, at most once per <see cref="IgnoredStepLogInterval"/>
+    /// per wheel with a count of those in between, so a wheel that chatters all day can't fill the log.
+    /// </summary>
+    private void LogIgnoredStep(Guid containerId, MixLevels levels, MixLevels shown, TimeSpan now)
+    {
+        if (_ignoredSteps.TryGetValue(containerId, out var last) && now - last.LoggedAt < IgnoredStepLogInterval)
+        {
+            _ignoredSteps[containerId] = (last.LoggedAt, last.Unlogged + 1);
+            return;
+        }
+
+        Logger.Info(
+            "Wheel {Container} moved too little for the popup: game {Game}, chat {Chat} (popup last showed game {ShownGame}, chat {ShownChat}; {Unlogged} more since the last line)",
+            containerId, levels.Game, levels.Chat, shown.Game, shown.Chat, last.Unlogged);
+        _ignoredSteps[containerId] = (now, 0);
     }
 
     /// <summary>A wheel's position (moved, or read at start); true when it changed.</summary>
@@ -918,6 +1047,8 @@ public sealed class MixEngine : IDisposable
             }
 
             _wheels.Remove(container);
+            _wheelPopups.Remove(container);
+            _ignoredSteps.Remove(container);
             _headsetState.Remove(container);
             _connectedLate.Remove(container);
             _awaitingEndpoint.Remove(container);
@@ -952,54 +1083,6 @@ public sealed class MixEngine : IDisposable
     private void ApplyAll()
     {
         var live = new HashSet<string>();
-    /// <summary>
-    /// Whether a wheel's turn to <paramref name="levels"/> shows the mix popup, or is too small to be
-    /// more than the wheel's own flicker (<see cref="MixPopup"/>). Logs each one left out, so how often a
-    /// headset's wheel flickers, and by how much, can be read from the log.
-    /// </summary>
-    private bool ShowsPopup(Guid containerId, MixLevels levels)
-    {
-        var now = TimeSpan.FromMilliseconds(Environment.TickCount64);
-        MixPopup.State? state = _wheelPopups.TryGetValue(containerId, out var known) ? known : null;
-        var (show, next) = MixPopup.Turned(state, levels, now);
-        _wheelPopups[containerId] = next;
-
-        // The popup opening from closed: one line per turn, so a popup that still seems random can be
-        // matched to what the wheel reported.
-        bool wasOpen = state is { } previous && now < previous.OpenUntil;
-        if (show && !wasOpen && state is { } from)
-        {
-            Logger.Info(
-                "Wheel {Container} turned from game {FromGame}, chat {FromChat} to game {Game}, chat {Chat}: popup shown",
-                containerId, from.Rest.Game, from.Rest.Chat, levels.Game, levels.Chat);
-        }
-
-        if (!show)
-        {
-            LogIgnoredStep(containerId, levels, next.Rest, now);
-        }
-
-        return show;
-    }
-
-    /// <summary>
-    /// Log a wheel step too small for the popup, at most once per <see cref="IgnoredStepLogInterval"/>
-    /// per wheel with a count of those in between, so a wheel that chatters all day can't fill the log.
-    /// </summary>
-    private void LogIgnoredStep(Guid containerId, MixLevels levels, MixLevels shown, TimeSpan now)
-    {
-        if (_ignoredSteps.TryGetValue(containerId, out var last) && now - last.LoggedAt < IgnoredStepLogInterval)
-        {
-            _ignoredSteps[containerId] = (last.LoggedAt, last.Unlogged + 1);
-            return;
-        }
-
-        Logger.Info(
-            "Wheel {Container} moved too little for the popup: game {Game}, chat {Chat} (popup last showed game {ShownGame}, chat {ShownChat}; {Unlogged} more since the last line)",
-            containerId, levels.Game, levels.Chat, shown.Game, shown.Chat, last.Unlogged);
-        _ignoredSteps[containerId] = (now, 0);
-    }
-
         var playing = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var device in _devices.Values)
         {
@@ -1047,8 +1130,6 @@ public sealed class MixEngine : IDisposable
                 session.Volume = volume;
             }
         });
-            _wheelPopups.Remove(container);
-            _ignoredSteps.Remove(container);
     }
 
     private void SaveBaselinesIfChanged()

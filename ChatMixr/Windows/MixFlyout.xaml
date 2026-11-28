@@ -91,6 +91,7 @@
                             <TextBlock x:Name="InGameChatInstruction" Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Margin="0,-4,0,8" Visibility="Collapsed" />
                             <cls:LabeledSwitch x:Name="AutoSwitchSwitch" Toggled="AutoSwitchSwitch_Toggled" />
+                            <cls:LabeledSwitch x:Name="AutoSwitchDevicesSwitch" Toggled="AutoSwitchDevicesSwitch_Toggled" />
                             <cls:LabeledSwitch x:Name="ShortcutsSwitch" Toggled="ShortcutsSwitch_Toggled" />
                             <!-- Turning the shortcuts on found one already taken by another app -->
                             <TextBlock x:Name="ShortcutsProblem" l10n:Localize.Text="settings.shortcuts-taken" Style="{StaticResource CaptionTextBlockStyle}"

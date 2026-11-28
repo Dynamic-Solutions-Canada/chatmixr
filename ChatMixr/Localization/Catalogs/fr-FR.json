@@ -109,6 +109,8 @@
   "settings.appearance": "Apparence",
   "settings.auto-switch": "Changer de périphérique quand un casque s'allume ou s'éteint",
   "settings.auto-switch-note": "ChatMixr utilise alors le premier périphérique prêt dans votre ordre de la page Périphériques : un casque SteelSeries Arctis tant qu'il est allumé, tout autre périphérique toujours. Désactivez ceci si une autre application choisit votre périphérique audio.",
+  "settings.auto-switch-devices": "Changer de périphérique quand une télé, un écran ou des haut-parleurs s'allument ou s'éteignent",
+  "settings.auto-switch-devices-note": "Quand l'un d'eux devient disponible et arrive en tête des périphériques prêts dans votre ordre de la page Périphériques, ChatMixr passe dessus ; quand le périphérique utilisé disparaît, il passe au premier prêt. Désactivé par défaut, car le son d'une télé ou d'un écran va et vient chaque fois que l'écran sort de veille ou change d'entrée.",
   "settings.behaviour": "Général",
   "settings.devices-and-keys": "Périphériques et raccourcis",
   "settings.reset": "Réinitialisation",

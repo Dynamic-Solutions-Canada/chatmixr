@@ -28,6 +28,11 @@
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
                     </StackPanel>
                     <StackPanel Spacing="2">
+                        <cls:LabeledSwitch x:Name="AutoSwitchDevicesSwitch" Toggled="AutoSwitchDevicesSwitch_Toggled" />
+                        <TextBlock l10n:Localize.Text="settings.auto-switch-devices-note" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <StackPanel Spacing="2">
                         <cls:LabeledSwitch x:Name="ShortcutsSwitch" Toggled="ShortcutsSwitch_Toggled" />
                         <TextBlock x:Name="ShortcutsNote" Style="{StaticResource CaptionTextBlockStyle}"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />

@@ -15,7 +15,7 @@ This app's own interface conventions. The shared family rules are in the standar
 
 ## Tray flyout
 
-- `MixFlyout` has four rows: a `BodyStrongTextBlockStyle` header, the device list, warnings (the relay failing, the microphone, Sonar while it runs with a wheel headset connected; always in the popup itself, never in Options), and a footer on `LayerOnAcrylicFillColorDefaultBrush` with a top `CardStrokeColorDefaultBrush` border. The footer holds the in-use device's volume (mute button, slider, level; it follows changes made elsewhere, and collapses when nothing is in use), then an Options button (`E9E9`) whose `Flyout` opens above it with the in-game voice chat switch and its instruction line (or, with no cable, a "Set up in-game voice chat" link to the Chat apps page), auto-switch and shortcuts, then a gear button that opens the main window. Both are icon-only with a tooltip. The popup shows no status line; the tray icon's tooltip keeps it.
+- `MixFlyout` has four rows: a `BodyStrongTextBlockStyle` header, the device list, warnings (the relay failing, the microphone, Sonar while it runs with a wheel headset connected; always in the popup itself, never in Options), and a footer on `LayerOnAcrylicFillColorDefaultBrush` with a top `CardStrokeColorDefaultBrush` border. The footer holds the in-use device's volume (mute button, slider, level; it follows changes made elsewhere, and collapses when nothing is in use), then an Options button (`E9E9`) whose `Flyout` opens above it with the in-game voice chat switch and its instruction line (or, with no cable, a "Set up in-game voice chat" link to the Chat apps page), auto-switch for headsets and for other devices, and shortcuts, then a gear button that opens the main window. Both are icon-only with a tooltip. The popup shows no status line; the tray icon's tooltip keeps it.
 - The list is refreshed from the engine's snapshot on every change and every language change while it is open, and on each open; the flyout resizes only when the number of devices changes.
 
 ## Mix popup
@@ -37,7 +37,7 @@ This app's own interface conventions. The shared family rules are in the standar
 ## Switches
 
 - Every ChatMixr switch is a `LabeledSwitch` (`LabelKey` set to a catalog key in the page's code, not XAML, so the catalog check sees it; `HelpKey` likewise for an optional help icon whose text shows on hover and in a panel on click): the switch, then its label beside it, wrapping when long and toggling when clicked, never a header above with "On"/"Off" (a ToggleSwitch's own content can't wrap and overflows the popup). The kit's Settings rows keep their own layout, so they never share a card with `LabeledSwitch`es: on the Settings page the Startup row has the General card to itself and ChatMixr's switches sit in "Devices and shortcuts".
-- Options switched in more than one place (auto-switch, shortcuts) go through `AppOptions`, which raises `Changed` so every place shows the same state.
+- Options switched in more than one place (both auto-switches, shortcuts) go through `AppOptions`, which raises `Changed` so every place shows the same state.
 
 ## Game Bar widget
 

@@ -17,6 +17,7 @@ var scenarios = new List<(string Name, Action<string> Body)>
     ("a current file loads without a backup", CurrentVersion),
     ("a file from a newer version is backed up and loaded as far as this version understands", NewerVersion),
     ("Reset keeps the old file and brings the default chat apps back", ResetKeepsOldFile),
+    ("a file saved before device auto-switching existed loads it as off, and a saved true round-trips", AutoSwitchDevicesAdded),
     ("slider positions, the device order and a recorded shortcut round-trip", DeviceSettingsRoundTrip),
     ("a version 0 file where ChatMixr renamed the cable keeps its names on, with a backup", RenamedCableStaysOn),
     ("a version 0 file where nothing was renamed turns the cable names off", UnrenamedCableTurnsOff),
@@ -73,6 +74,19 @@ void UnrenamedCableTurnsOff(string path)
     Check(!result.Settings.RenameCable, "version 0 saved true without anyone choosing it, so it becomes off");
 }
 
+void AutoSwitchDevicesAdded(string path)
+{
+    File.WriteAllText(path, $$"""{ "SchemaVersion": {{SettingsMigrations.Steps.Count}}, "AutoSwitchHeadsets": true }""");
+    var store = Store(path);
+    var result = store.Load();
+    Check(result.Outcome == SettingsLoadOutcome.Loaded && result.BackupPath == null, "a current file without the field needs no upgrade");
+    Check(!result.Settings.AutoSwitchDevices, "the missing field is off, the default");
+
+    result.Settings.AutoSwitchDevices = true;
+    store.Save(result.Settings);
+    Check(store.Load().Settings.AutoSwitchDevices, "turned on, it stays on after saving and loading again");
+}
+
 void FirstRun(string path)
 {
     var result = Store(path).Load();
@@ -89,6 +103,7 @@ void FirstRun(string path)
     Check(!result.Settings.MixShortcuts, "the mix shortcuts start off");
     Check(result.Settings.ShortcutTowardChat == Shortcut.DefaultTowardChat && result.Settings.ShortcutTowardGame == Shortcut.DefaultTowardGame, "the shortcuts start as Ctrl+Shift+Plus / Minus");
     Check(result.Settings.AutoSwitchHeadsets, "switching to a headset when it turns on starts on");
+    Check(!result.Settings.AutoSwitchDevices, "switching when a TV or speaker turns on or off starts off");
     Check(!result.Settings.RenameCable && result.Settings.CableOriginalNames.Count == 0, "ChatMixr's cable names start off, with nothing renamed");
     Check(result.Settings.CallsDevice == null, "no calls device is known yet");
 }

@@ -109,6 +109,8 @@
   "settings.appearance": "外观",
   "settings.auto-switch": "耳机开启或关闭时切换设备",
   "settings.auto-switch-note": "ChatMixr 会使用“设备”页面中顺序最靠前且就绪的设备：SteelSeries Arctis 耳机在开启时就绪，其他设备始终就绪。如果其他应用会选择你的音频设备，请关闭此项。",
+  "settings.auto-switch-devices": "电视、显示器或扬声器开启或关闭时切换设备",
+  "settings.auto-switch-devices-note": "当其中一个变为可用，且在“设备”页面的顺序中位于就绪设备的最前面时，ChatMixr 会切换到它；当正在使用的设备消失时，会切换到第一个就绪的设备。默认关闭，因为电视或显示器的声音设备会在屏幕唤醒或切换输入时出现又消失。",
   "settings.behaviour": "常规",
   "settings.devices-and-keys": "设备和快捷键",
   "settings.reset": "重置",

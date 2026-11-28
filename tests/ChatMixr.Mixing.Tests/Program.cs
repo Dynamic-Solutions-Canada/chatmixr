@@ -43,6 +43,7 @@ var scenarios = new List<(string Name, Action Body)>
     ("a receiver plugged in while running brings its headset on; one found at start doesn't", HeadsetPowerChanges),
     ("a wheel's flicker of a step or two never shows the mix popup; a real turn does, and it follows smoothly", WheelPopupIgnoresFlicker),
     ("a wheel that keeps flickering after a turn can't hold the popup open", WheelPopupFlickerAfterTurn),
+    ("a TV appearing is switched to only when it is first in the order; the device in use going away switches", DeviceChangesSwitch),
     ("moving a device up or down swaps it with its neighbour, and stops at the ends", OrderMove),
     ("a Squirrel shortcut's program is the one it starts, not Update.exe", ShortcutProgram),
     ("the search ranks name starts first, leaves out chat apps, and matches program names", SearchRanking),
@@ -384,6 +385,26 @@ void WheelPopupFlickerAfterTurn()
     // A status answer (the headset turned off and on, say) settles the wheel where it now is.
     state = MixPopup.Settled(new MixLevels(100, 70));
     Check(!MixPopup.Turned(state, new MixLevels(100, 71), t).Show, "flicker after a status answer is measured from it, and stays hidden");
+}
+
+void DeviceChangesSwitch()
+{
+    // The user's order: two headsets (off), the TV, the soundbar; the soundbar is in use.
+    string[] order = ["gen2", "7x", "tv", "soundbar"];
+    var ready = new HashSet<string> { "tv", "soundbar" };
+    string? preferred = DeviceOrder.Preferred(order, ready.Contains);
+    Check(DeviceChanges.ArrivalTarget(preferred, ["tv"]) == "tv", "the TV turns on above the soundbar: the TV");
+    Check(DeviceChanges.ArrivalTarget(preferred, ["TV"]) == "tv", "ids compare without case, as Windows' do");
+    Check(DeviceChanges.ArrivalTarget(preferred, []) == null, "nothing appeared: no switch");
+
+    // A monitor lower in the order wakes: the TV is still preferred, and the manual pick sticks.
+    Check(DeviceChanges.ArrivalTarget(preferred, ["monitor"]) == null, "a device that isn't first: no switch");
+    Check(DeviceChanges.ArrivalTarget(null, ["tv"]) == null, "nothing ready: no switch");
+
+    Check(DeviceChanges.InUseWentAway("tv", ["TV"]), "the TV in use was turned off: switch");
+    Check(!DeviceChanges.InUseWentAway("tv", []), "moved off the TV by hand, the TV still there: no switch");
+    Check(!DeviceChanges.InUseWentAway("sonar", ["monitor"]), "moved off a device ChatMixr never lists: the pick sticks");
+    Check(!DeviceChanges.InUseWentAway(null, ["tv"]), "a device not in use went away: no switch");
 }
 
 void OrderMove()

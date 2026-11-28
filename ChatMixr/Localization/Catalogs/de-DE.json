@@ -109,6 +109,8 @@
   "settings.appearance": "Darstellung",
   "settings.auto-switch": "Gerät wechseln, wenn ein Headset ein- oder ausgeschaltet wird",
   "settings.auto-switch-note": "ChatMixr verwendet dann das erste bereite Gerät in deiner Reihenfolge auf der Seite „Geräte“: ein SteelSeries Arctis-Headset, solange es an ist, jedes andere Gerät immer. Schalte dies aus, wenn eine andere App dein Audiogerät wählt.",
+  "settings.auto-switch-devices": "Gerät wechseln, wenn ein Fernseher, Monitor oder Lautsprecher ein- oder ausgeschaltet wird",
+  "settings.auto-switch-devices-note": "Wird eines verfügbar und steht es unter den bereiten Geräten in deiner Reihenfolge auf der Seite „Geräte“ ganz oben, wechselt ChatMixr dorthin; verschwindet das verwendete Gerät, wechselt es zum ersten bereiten. Standardmäßig aus, weil der Ton eines Fernsehers oder Monitors jedes Mal kommt und geht, wenn der Bildschirm aufwacht oder den Eingang wechselt.",
   "settings.behaviour": "Allgemein",
   "settings.devices-and-keys": "Geräte und Tastenkombinationen",
   "settings.reset": "Zurücksetzen",

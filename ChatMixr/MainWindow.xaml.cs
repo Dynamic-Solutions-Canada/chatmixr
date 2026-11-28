@@ -106,6 +106,7 @@ public sealed partial class MainWindow : Window
             SettingsManager.Current.InGameVoiceChat,
             SettingsManager.Current.RenameCable,
             SettingsManager.Current.AutoSwitchHeadsets,
+            SettingsManager.Current.AutoSwitchDevices,
             SettingsManager.Current.CallsDevice);
         _flyout = new MixFlyout(Engine);
         _osd = new OsdWindow();   // its OsdController registers it with HostWindow.CloseOnExit
@@ -119,6 +120,7 @@ public sealed partial class MainWindow : Window
             Engine.SetSeparateChat(SettingsManager.Current.InGameVoiceChat);
             ApplyShortcuts();
             Engine.SetAutoSwitch(SettingsManager.Current.AutoSwitchHeadsets);
+            Engine.SetAutoSwitchDevices(SettingsManager.Current.AutoSwitchDevices);
             Engine.SetRenameCable(SettingsManager.Current.RenameCable, SettingsManager.Current.CableOriginalNames, SettingsManager.Current.HiddenCableEndpoints);
             DeviceActions.SettingsWereReset();
         };

@@ -18,7 +18,7 @@
 | Installed apps for the chat app search | `Services/InstalledApps.cs` |
 | Tray icon artwork | `Classes/TrayIconRenderer.cs` |
 | Mixing: audio thread, passes, devices, receivers, restore on exit | `Services/MixEngine.cs` |
-| Windows' default devices | `Services/DefaultDevices.cs` (reads and switches), `Services/AudioPolicy.cs` (the calls); what a switch moves in `Models/DefaultRoles.cs` |
+| Windows' default devices | `Services/DefaultDevices.cs` (reads and switches), `Services/AudioPolicy.cs` (the calls); what a switch moves in `Models/DefaultRoles.cs`; when a device appearing or going away switches in `Models/DeviceChanges.cs` |
 | The guided VB-Cable setup | `Classes/ChatDeviceSetup.cs` |
 | The on-screen mix and switch popup, and when a wheel shows it | `Windows/OsdWindow.xaml(.cs)`, `Models/MixPopup.cs` |
 | Styles for rows, badges and notes built in code | `Styles/RowStyles.xaml`, `Classes/CardRow.cs`, `Classes/Pill.cs` |
@@ -73,6 +73,7 @@
 - **Several at once:** each receiver's wheel controls its own headset; with two Nova 7 receivers plugged in, SteelSeries GG was seen to follow only one wheel.
 - **State:** each receiver is asked for its status when it connects (power, battery, wheel position: no "move the wheel" wait), and announces power and battery changes itself (`Models/ReceiverReport.cs`). Cards show "On · 79%" or "Off" (dimmed). A headset that comes on is asked for its status again.
 - **Auto-switch:** with "Switch devices when a headset turns on or off" (Settings, on by default), a headset turning on or off makes ChatMixr switch (follow-along) to the first ready device in the user's device order (a headset while on, any other device always, hidden ones never) and show the device in the on-screen popup; between changes, a manual switch sticks. Plugging a receiver in while ChatMixr runs (alone or on a hub) counts as its headset turning on when the headset is on, and unplugging it counts as turning off (the switch waits a moment for Windows to remove anything else on the same hub, and never picks the unplugged headset); a receiver already connected at start only reports its state (`Models/HeadsetPower.cs`). After a replug, the switch waits up to 15 seconds for Windows to list the headset's playback device, which often appears after the receiver. Overlaps with Hub Display Switch's audio switching; turn one off if they disagree.
+- **Device auto-switch:** with "Switch devices when a TV, monitor or speaker turns on or off" (Settings, off by default, since a display's sound device comes and goes each time its screen wakes or changes input), a device other than a wireless headset appearing makes ChatMixr switch to it only when it is now the first ready device in the user's order, so a manual pick sticks when something lower down appears; and when the device in use goes away (Windows moved its default off a device that is no longer listed), ChatMixr switches to the first ready device instead of keeping Windows' pick (`Models/DeviceChanges.cs`). A new device is judged one scan after it appears, so a headset's playback device listed a moment before its receiver opens is never taken for a TV, and a device that flickers in and out is never picked. Wireless headsets stay with the headset setting; neither acts while an unplugged receiver's own switch is pending.
 
 ## Shortcuts and the mix popup
 
